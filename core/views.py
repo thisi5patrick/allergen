@@ -1,9 +1,12 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_POST
 from django_htmx.http import HttpResponseClientRedirect, trigger_client_event
+
+from core.forms import RegistrationForm
 
 
 @login_required(redirect_field_name=None, login_url="login")
@@ -38,3 +41,27 @@ def login_process(request: HttpRequest) -> HttpResponse:
         error_message = "Invalid username or password. Please try again."
         response = render(request, "login/login_error_message.html", {"error_message": error_message})
         return trigger_client_event(response, "login_error")
+
+
+@require_GET
+def registration_page(request: HttpRequest) -> HttpResponse:
+    return render(request, "registration/registration.html")
+
+
+@require_POST
+def registration_process(request: HttpRequest) -> HttpResponse:
+    form = RegistrationForm(request.POST)
+
+    if form.is_valid():
+        user = User.objects.create_user(
+            username=form.cleaned_data["username"],
+            email=form.cleaned_data["email"],
+            password=form.cleaned_data["password"],
+        )
+        user.save()
+        login(request, user)
+
+        return redirect("dashboard")
+
+    response = render(request, "registration/registration_error_message.html", {"form": form})
+    return trigger_client_event(response, "register_error")
