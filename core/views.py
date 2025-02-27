@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_not_required
 from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse
@@ -73,3 +73,10 @@ def registration_process(request: HttpRequest) -> HttpResponse:
 
     response = render(request, "registration/registration_error_message.html", {"form": form})
     return trigger_client_event(response, "register_error")
+
+
+@require_POST
+def logout_process(request: HttpRequest) -> HttpResponse:
+    if request.user.is_authenticated:
+        logout(request)
+    return HttpResponseClientRedirect("/login/")

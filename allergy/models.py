@@ -2,8 +2,7 @@ import uuid
 
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.db.models import CharField, IntegerField, Model, TextChoices, UUIDField, CASCADE, ForeignKey, DateField
-
+from django.db.models import CASCADE, CharField, DateField, ForeignKey, IntegerField, Model, TextChoices, UUIDField
 
 
 class AllergiesEntry(Model):
@@ -13,7 +12,6 @@ class AllergiesEntry(Model):
 
     def __str__(self) -> str:
         return f"{self.user} - {self.date}"
-
 
 
 class AllergySymptoms(Model):
@@ -26,7 +24,7 @@ class AllergySymptoms(Model):
     uuid = UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     symptom = CharField(max_length=255, choices=Symptoms.choices)
     intensity = IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)])
-    entry = ForeignKey(AllergiesEntry, on_delete=CASCADE, related_name='symptoms')
+    entry = ForeignKey(AllergiesEntry, on_delete=CASCADE, related_name="symptoms")
 
     def __str__(self) -> str:
         return f"{self.symptom} - {self.intensity}"
