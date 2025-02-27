@@ -8,6 +8,7 @@ dependencies = [
     "django>=5.1.6",
     "django-htmx>=1.22.0",
     "psycopg2-binary>=2.9.10",
+    "python-dotenv>=1.0.1",
 ]
 
 [dependency-groups]
@@ -31,6 +32,7 @@ warn_return_any = true
 warn_redundant_casts = true
 strict_equality = true
 
+plugins = ["mypy_django_plugin.main"]
 
 [tool.ruff]
 line-length = 120
@@ -60,4 +62,4 @@ lint.select = [
 ]
 
 [tool.django-stubs]
-django_settings_module = "allergen.settings"
+django_settings_module = "config.settings"

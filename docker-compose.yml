@@ -8,31 +8,26 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/postgres"
+      DB_HOST: "postgres"
     depends_on:
-      db:
+      postgres:
         condition: service_healthy
-    volumes:
-      - .:/app
-      - /app/.venv
-    restart: unless-stopped
+    restart: on-failure
 
-  db:
+  postgres:
     image: postgres:16-alpine
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_DB=postgres
     ports:
-      - "5440:5432"
+      - '${POSTGRES_PORT}:5432'
+    user: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: pg_isready
       interval: 5s
       timeout: 5s
       retries: 5
-    restart: unless-stopped
-
-volumes:
-  postgres_data:
+      start_period: 10s
+    restart: on-failure
