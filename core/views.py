@@ -1,5 +1,5 @@
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_not_required
 from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
@@ -9,12 +9,14 @@ from django_htmx.http import HttpResponseClientRedirect, trigger_client_event
 from core.forms import RegistrationForm
 
 
-@login_required(redirect_field_name=None, login_url="login")
-def index(request: HttpRequest) -> HttpResponse:
-    return redirect("dashboard")
+def view_404(request: HttpRequest, exception: None | Exception = None) -> HttpResponse:
+    if request.user.is_authenticated:
+        return redirect("dashboard")
+    return redirect("login")
 
 
 @require_GET
+@login_not_required
 def login_page(request: HttpRequest) -> HttpResponse:
     if request.user.is_authenticated:
         return redirect("dashboard")
@@ -23,6 +25,7 @@ def login_page(request: HttpRequest) -> HttpResponse:
 
 
 @require_POST
+@login_not_required
 def login_process(request: HttpRequest) -> HttpResponse:
     username = request.POST.get("username")
     password = request.POST.get("password")
@@ -44,11 +47,16 @@ def login_process(request: HttpRequest) -> HttpResponse:
 
 
 @require_GET
+@login_not_required
 def registration_page(request: HttpRequest) -> HttpResponse:
+    if request.user.is_authenticated:
+        return redirect("dashboard")
+
     return render(request, "registration/registration.html")
 
 
 @require_POST
+@login_not_required
 def registration_process(request: HttpRequest) -> HttpResponse:
     form = RegistrationForm(request.POST)
 
