@@ -10,11 +10,11 @@ RUN uv venv
 
 ENV PATH="/app/.venv/bin:$PATH"
 
-RUN uv sync --frozen --no-install-project --no-dev
+RUN uv sync --frozen --no-install-project
 
 COPY . /app
 
-RUN uv sync --frozen --no-dev
+RUN uv sync --frozen
 
 RUN chmod +x /app/scripts/entrypoint.sh
 

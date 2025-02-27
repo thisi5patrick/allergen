@@ -1,0 +1,31 @@
+default_stages: [ pre-commit ]
+default_language_version:
+  python: python3.13
+
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.14
+    hooks:
+      # linter
+      - id: ruff
+        args: [ --fix ]
+      # formatter
+      - id: ruff-format
+        types: [ python ]
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.13.0
+    hooks:
+      - id: mypy
+        args: [ --config-file, pyproject.toml ]
+        types: [ python ]
+        additional_dependencies:
+          - python-dotenv
+          - django-stubs
+          - django_htmx
+          - psycopg
+
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.6.2
+    hooks:
+      - id: uv-lock
