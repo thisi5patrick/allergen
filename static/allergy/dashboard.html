@@ -2,9 +2,8 @@
 {% load static %}
 
 {% block content %}
-
-    <script src="{% static 'allergy/scripts/calendar.js' %}"></script>
     <script src="{% static 'allergy/scripts/symptoms_selector.js' %}"></script>
+    <script src="{% static 'allergy/scripts/calendar.js' %}"></script>
 
     <div class="min-h-screen bg-gray-100 flex flex-col">
         {% include 'navbar.html' %}
@@ -50,9 +49,11 @@
                     </button>
                 </div>
 
-                <div id="intensitySelectors" class="mt-4 space-y-3 hidden">
-                    <!-- Dynamically added intensity selectors will appear here -->
-                </div>
+                <input type="hidden" id="csrfToken" value="{{ csrf_token }}">
+
+                <div id="intensitySelectors" class="mt-4 space-y-3 hidden"></div>
+
+                <div id="date-info"></div>
             </div>
         </div>
     </div>

@@ -21,4 +21,7 @@ media/
 .idea/
 .vscode/
 *.swp
-*.swo 
+*.swo
+
+.DS_Store
+

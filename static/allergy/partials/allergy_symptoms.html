@@ -1,3 +1,11 @@
-{% for allergy in allergies %}
-    <p>{{ allergy.name }}</p>
-{% endfor %}
+{% if allergies %}
+    <div id="stored-symptoms" class="hidden">
+        {% for allergy in allergies %}
+            <div
+                data-symptom="{{ allergy.symptom }}"
+                data-intensity="{{ allergy.intensity }}"
+                data-display-name="{{ allergy.get_symptom_display }}">
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
