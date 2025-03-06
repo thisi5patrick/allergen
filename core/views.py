@@ -69,7 +69,7 @@ def registration_process(request: HttpRequest) -> HttpResponse:
         user.save()
         login(request, user)
 
-        return redirect("dashboard")
+        return HttpResponseClientRedirect("/dashboard/")
 
     response = render(request, "registration/registration_error_message.html", {"form": form})
     return trigger_client_event(response, "register_error")
