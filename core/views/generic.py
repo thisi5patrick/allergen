@@ -51,7 +51,6 @@ def login_process(request: HttpRequest) -> HttpResponse:
 def registration_page(request: HttpRequest) -> HttpResponse:
     if request.user.is_authenticated:
         return redirect("dashboard")
-
     return render(request, "registration/registration.html")
 
 

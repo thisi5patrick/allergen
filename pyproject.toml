@@ -38,6 +38,11 @@ strict_equality = true
 
 plugins = ["mypy_django_plugin.main"]
 
+[[tool.mypy.overrides]]
+module = "environ"
+ignore_missing_imports = true
+
+
 [tool.ruff]
 line-length = 120
 lint.select = [

@@ -22,8 +22,10 @@ repos:
         additional_dependencies:
           - python-dotenv
           - django-stubs
-          - django_htmx
+          - django-htmx
           - psycopg
+          - django-environ
+          - whitenoise
 
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: 0.6.2

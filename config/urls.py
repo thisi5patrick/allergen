@@ -24,4 +24,4 @@ urlpatterns = [
     path("", include("allergy.urls")),
 ]
 
-handler404 = "core.views.view_404"
+handler404 = "core.views.generic.view_404"
