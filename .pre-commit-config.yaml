@@ -26,6 +26,8 @@ repos:
           - psycopg
           - django-environ
           - whitenoise
+          - pytest-django
+          - factory-boy
 
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: 0.6.2

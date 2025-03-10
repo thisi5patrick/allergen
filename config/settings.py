@@ -18,7 +18,7 @@ env = environ.Env(
     DEBUG=(bool, False),
     SECRET_KEY=(str, "django-insecure-x2_aa!gm2qc0laas*d*at!0p9avyyp8qs10!e(5%dpc)-p(xjc"),
     ALLOWED_HOSTS=(list, ["localhost"]),
-    DB_URL=(str, "postgresql://postgres:postgres@localhost:5432/postgres"),
+    DATABASE_URL=(str, "postgresql://postgres:postgres@localhost:5432/postgres"),
     CSRF_TRUSTED_ORIGINS=(list, []),
 )
 
@@ -59,7 +59,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django.contrib.auth.middleware.LoginRequiredMiddleware",
+    "core.middlewares.CustomLoginRequiredMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
@@ -71,7 +71,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": ["static"],
+        "DIRS": [BASE_DIR / "static"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

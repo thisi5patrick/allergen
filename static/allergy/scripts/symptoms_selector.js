@@ -34,9 +34,37 @@ document.addEventListener("DOMContentLoaded", function() {
         loadSymptomsFromResponse();
     });
 
+    document.body.addEventListener('htmx:beforeSend', function(event) {
+        if (event.detail.elt.hasAttribute('hx-post') &&
+            event.detail.elt.getAttribute('hx-post').includes('/add_symptom/')) {
+            if (!document.getElementById('symptom-form-errors')) {
+                const errorContainer = document.createElement('div');
+                errorContainer.id = 'symptom-form-errors';
+                errorContainer.className = 'mt-4';
+                intensitySelectors.after(errorContainer);
+            } else {
+                document.getElementById('symptom-form-errors').innerHTML = '';
+            }
+        }
+    });
+
     document.body.addEventListener('htmx:afterSwap', function(e) {
         if (e.detail.target.id === 'date-info') {
             setTimeout(loadSymptomsFromResponse, 50);
+        }
+
+        if (e.detail.target.id === 'symptom-form-errors') {
+            e.detail.target.scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+
+    document.body.addEventListener('htmx:responseError', function(event) {
+        if (event.detail.xhr.status === 400) {
+            const errorContainer = document.getElementById('symptom-form-errors');
+            if (errorContainer) {
+                errorContainer.innerHTML = event.detail.xhr.responseText;
+                errorContainer.scrollIntoView({ behavior: 'smooth' });
+            }
         }
     });
 
@@ -144,6 +172,7 @@ document.addEventListener("DOMContentLoaded", function() {
             intensityButton.setAttribute("hx-post", "/add_symptom/");
             intensityButton.setAttribute("hx-target", "#date-info");
             intensityButton.setAttribute("hx-swap", "innerHTML");
+            intensityButton.setAttribute("hx-target-error", "#symptom-form-errors");
             intensityButton.setAttribute(
                 "hx-headers",
                 JSON.stringify({ "X-CSRFToken": getCsrfToken() })

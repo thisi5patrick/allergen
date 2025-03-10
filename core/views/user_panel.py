@@ -1,4 +1,4 @@
-from django.db.models import Case, CharField, Count, Value, When
+from django.db.models import Count
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_GET

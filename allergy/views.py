@@ -7,6 +7,7 @@ from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_POST
 from django_htmx.http import trigger_client_event
 
+from allergy.forms import AddSymptomForm, DeleteSymptomForm
 from allergy.models import AllergyEntries, AllergySymptoms
 
 
@@ -35,26 +36,37 @@ def get_calendar(request: HttpRequest, year: int, month: int, day: int) -> HttpR
 
 @require_POST
 def add_symptom(request: HttpRequest) -> HttpResponse:
-    date_ = request.POST.get("date")
-    symptom = request.POST.get("symptom")
-    intensity = int(request.POST.get("intensity", 1))
+    form = AddSymptomForm(request.POST, user=request.user)
+    if not form.is_valid():
+        return render(
+            request,
+            "allergy/partials/add_symptom_error.html",
+            {
+                "form": form,
+            },
+        )
 
-    entry, _ = AllergyEntries.objects.get_or_create(user=request.user, entry_date=date_)
-
-    allergy_symptom, _ = AllergySymptoms.objects.update_or_create(
-        entry=entry, symptom=symptom, defaults={"intensity": intensity}
-    )
+    entry = form.save()
+    selected_date = form.cleaned_data["date"]
 
     allergies = entry.symptoms.all()
 
     response = render(
-        request, "allergy/partials/allergy_symptoms.html", {"allergies": allergies, "selected_date": date_}
+        request,
+        "allergy/partials/allergy_symptoms.html",
+        {
+            "allergies": allergies,
+            "selected_date": selected_date,
+        },
     )
     return trigger_client_event(response, "allergy_symptoms_updated")
 
 
 @require_POST
 def delete_symptom(request: HttpRequest) -> HttpResponse:
+    form = DeleteSymptomForm(request.POST, user=request.user)
+    form.delete()
+
     symptom_date_str = request.POST.get("date")
     symptom = request.POST.get("symptom")
 
