@@ -10,4 +10,5 @@ class AllergySymptomsFactory(factory.django.DjangoModelFactory[AllergySymptoms])
         model = AllergySymptoms
 
     symptom = factory.fuzzy.FuzzyChoice(AllergySymptoms.Symptoms)
+    intensity = factory.fuzzy.FuzzyInteger(1, 10)
     entry = factory.SubFactory(AllergyEntriesFactory)

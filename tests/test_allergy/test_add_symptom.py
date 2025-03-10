@@ -137,7 +137,7 @@ def test_add_symptom_incorrect_form_of_payload(
     assert form.errors[field] == [expected_error]
 
     context = cast(RequestContext, response.context)
-    assert context.template_name == "allergy/partials/add_symptom_error.html"
+    assert context.template_name == "allergy/partials/symptom_error.html"
 
 
 @pytest.mark.django_db()

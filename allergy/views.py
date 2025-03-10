@@ -1,14 +1,15 @@
 from datetime import date
+from http import HTTPStatus
 from typing import cast
 
 from django.contrib.auth.models import User
-from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_POST
 from django_htmx.http import trigger_client_event
 
 from allergy.forms import AddSymptomForm, DeleteSymptomForm
-from allergy.models import AllergyEntries, AllergySymptoms
+from allergy.models import AllergyEntries
 
 
 def redirect_to_dashboard(request: HttpRequest) -> HttpResponse:
@@ -40,7 +41,7 @@ def add_symptom(request: HttpRequest) -> HttpResponse:
     if not form.is_valid():
         return render(
             request,
-            "allergy/partials/add_symptom_error.html",
+            "allergy/partials/symptom_error.html",
             {
                 "form": form,
             },
@@ -65,23 +66,15 @@ def add_symptom(request: HttpRequest) -> HttpResponse:
 @require_POST
 def delete_symptom(request: HttpRequest) -> HttpResponse:
     form = DeleteSymptomForm(request.POST, user=request.user)
+    if not form.is_valid():
+        return render(
+            request,
+            "allergy/partials/symptom_error.html",
+            {
+                "form": form,
+            },
+        )
+
     form.delete()
 
-    symptom_date_str = request.POST.get("date")
-    symptom = request.POST.get("symptom")
-
-    if not symptom_date_str or not symptom:
-        return JsonResponse({"success": False, "error": "Invalid data provided."})
-
-    symptom_date = date.fromisoformat(symptom_date_str)
-
-    user = cast(User, request.user)
-    entry = AllergyEntries.objects.filter(user=user, entry_date=symptom_date).first()
-
-    if entry:
-        deleted, _ = AllergySymptoms.objects.filter(entry=entry, symptom=symptom).delete()
-
-        if not entry.symptoms.exists():
-            entry.delete()
-
-    return JsonResponse({"success": True})
+    return HttpResponse(status=HTTPStatus.NO_CONTENT)

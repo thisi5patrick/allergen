@@ -1,6 +1,5 @@
 from typing import Any
 
-from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.forms import ChoiceField, DateField, DateInput, Form, IntegerField, NumberInput
 
@@ -43,9 +42,6 @@ class DeleteSymptomForm(Form):
         super().__init__(*args, **kwargs)
 
     def delete(self) -> None:
-        if not self.is_valid():
-            raise ValidationError("Form is not valid")
-
         entry_date = self.cleaned_data["date"]
         symptom = self.cleaned_data["symptom"]
 
