@@ -6,21 +6,20 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_GET
 
-from allergy.models import AllergyEntry, SymptomRecord
+from allergy.models import SymptomEntry
 
 
 @require_GET
 def user_overview(request: HttpRequest) -> HttpResponse:
     user = cast(User, request.user)
 
-    entries = AllergyEntry.objects.filter(user=user)
-    records = SymptomRecord.objects.filter(entry__user=user)
+    entries = SymptomEntry.objects.filter(user=user)
 
-    days_with_symptoms = entries.filter(symptom_records__isnull=False).values("entry_date").distinct().count()
-    total_entries = records.count()
-    recent_symptoms = records.select_related("symptom_type", "entry").order_by("-created_at")[:5]
+    days_with_symptoms = entries.values("entry_date").distinct().count()
+    total_entries = entries.count()
+    recent_symptoms = entries.select_related("symptom_type").order_by("-created_at")[:5]
     top_symptoms = (
-        records.values("symptom_type__name").annotate(count=Count("symptom_type__name")).order_by("-count")[:5]
+        entries.values("symptom_type__name").annotate(count=Count("symptom_type__name")).order_by("-count")[:5]
     )
 
     context = {

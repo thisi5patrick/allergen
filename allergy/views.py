@@ -9,7 +9,7 @@ from django.views.decorators.http import require_GET, require_POST
 from django_htmx.http import trigger_client_event
 
 from allergy.forms import AddSymptomForm, DeleteSymptomForm
-from allergy.models import AllergyEntry, SymptomType
+from allergy.models import SymptomEntry, SymptomType
 
 
 def redirect_to_dashboard(request: HttpRequest) -> HttpResponse:
@@ -28,19 +28,18 @@ def get_calendar(request: HttpRequest, year: int, month: int, day: int) -> HttpR
     selected_date = date(year, month, day)
 
     user = cast(User, request.user)
-    entry = AllergyEntry.objects.filter(user=user, entry_date=selected_date).first()
-
-    allergies = entry.symptom_records.all() if entry else []
+    entries = SymptomEntry.objects.filter(user=user, entry_date=selected_date).all()
 
     response = render(
-        request, "allergy/partials/allergy_symptoms.html", {"allergies": allergies, "selected_date": selected_date}
+        request, "allergy/partials/allergy_symptoms.html", {"allergies": entries, "selected_date": selected_date}
     )
     return trigger_client_event(response, name="allergy_symptoms_updated")
 
 
 @require_POST
 def add_symptom(request: HttpRequest) -> HttpResponse:
-    form = AddSymptomForm(request.POST, user=request.user)
+    user = cast(User, request.user)
+    form = AddSymptomForm(request.POST, user=user)
     if not form.is_valid():
         return render(
             request,
@@ -50,16 +49,17 @@ def add_symptom(request: HttpRequest) -> HttpResponse:
             },
         )
 
-    entry = form.save()
     selected_date = form.cleaned_data["date"]
 
-    allergies = entry.symptom_records.all()
+    form.save()
+
+    entries = SymptomEntry.objects.filter(user=user, entry_date=selected_date).all()
 
     response = render(
         request,
         "allergy/partials/allergy_symptoms.html",
         {
-            "allergies": allergies,
+            "allergies": entries,
             "selected_date": selected_date,
         },
     )

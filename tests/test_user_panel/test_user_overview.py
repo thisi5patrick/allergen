@@ -7,8 +7,7 @@ from django.test import Client
 from django.urls import reverse
 from pytest_django import DjangoAssertNumQueries
 
-from tests.factories.allergy_entry import AllergyEntryFactory
-from tests.factories.symptom_record import SymptomRecordFactory
+from tests.factories.symptom_entry import SymptomEntryFactory
 from tests.factories.symptom_type import SymptomTypeFactory
 
 
@@ -23,13 +22,9 @@ def test_get_user_overview(authenticated_client: Client, user: User) -> None:
     symptom_type_1 = SymptomTypeFactory.create(user=user, name="test_symptom_1")
     symptom_type_2 = SymptomTypeFactory.create(user=user, name="test_symptom_2")
 
-    entry_1 = AllergyEntryFactory.create(user=user, entry_date=today)
-    entry_2 = AllergyEntryFactory.create(user=user, entry_date=yesterday)
-    entry_3 = AllergyEntryFactory.create(user=user, entry_date=today)
-
-    SymptomRecordFactory.create(entry=entry_1, symptom_type=symptom_type_1)
-    SymptomRecordFactory.create(entry=entry_2, symptom_type=symptom_type_1)
-    SymptomRecordFactory.create(entry=entry_3, symptom_type=symptom_type_2)
+    SymptomEntryFactory.create(entry_date=today, symptom_type=symptom_type_1, user=user)
+    SymptomEntryFactory.create(entry_date=yesterday, symptom_type=symptom_type_1, user=user)
+    SymptomEntryFactory.create(entry_date=today, symptom_type=symptom_type_2, user=user)
 
     # WHEN
     response = authenticated_client.get(endpoint)
@@ -51,7 +46,7 @@ def test_get_user_overview_with_consistent_query_numbers(
     # GIVEN
     endpoint = reverse("user_overview")
 
-    SymptomRecordFactory.create_batch(number_of_symptoms, entry__user=user, symptom_type__user=user)
+    SymptomEntryFactory.create_batch(number_of_symptoms, user=user, symptom_type__user=user)
 
     # WHEN/THEN
     with django_assert_num_queries(6):

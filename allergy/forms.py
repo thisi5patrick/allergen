@@ -3,7 +3,7 @@ from typing import Any
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.forms import DateField, DateInput, Form, IntegerField, ModelChoiceField
 
-from allergy.models import AllergyEntry, SymptomRecord, SymptomType
+from allergy.models import SymptomEntry, SymptomType
 
 
 class AddSymptomForm(Form):
@@ -16,15 +16,16 @@ class AddSymptomForm(Form):
         super().__init__(*args, **kwargs)
         self.fields["symptom_type"].queryset = SymptomType.objects.filter(user=self.user).all()  # type: ignore
 
-    def save(self) -> AllergyEntry:
+    def save(self) -> SymptomEntry:
         entry_date = self.cleaned_data["date"]
         symptom_type = self.cleaned_data["symptom_type"]
         intensity = self.cleaned_data["intensity"]
 
-        entry, _ = AllergyEntry.objects.get_or_create(user=self.user, entry_date=entry_date)
-
-        symptom_record, _ = SymptomRecord.objects.update_or_create(
-            entry=entry, symptom_type=symptom_type, defaults={"intensity": intensity}
+        entry, _ = SymptomEntry.objects.update_or_create(
+            user=self.user,
+            entry_date=entry_date,
+            symptom_type=symptom_type,
+            defaults={"intensity": intensity},
         )
 
         return entry
@@ -43,9 +44,4 @@ class DeleteSymptomForm(Form):
         entry_date = self.cleaned_data["date"]
         symptom_type = self.cleaned_data["symptom_type"]
 
-        entry = AllergyEntry.objects.filter(user=self.user, entry_date=entry_date).first()
-        if entry:
-            deleted, _ = SymptomRecord.objects.filter(entry=entry, symptom_type=symptom_type).delete()
-
-            if not entry.symptom_records.exists():
-                entry.delete()
+        SymptomEntry.objects.filter(entry_date=entry_date, symptom_type=symptom_type).delete()

@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 from http import HTTPStatus
 
 import pytest
@@ -6,11 +6,78 @@ from django.contrib.auth.models import User
 from django.test import Client
 from django.urls import reverse
 
-from allergy.models import AllergyEntry, SymptomRecord, SymptomType
-from tests.factories.allergy_entry import AllergyEntryFactory
-from tests.factories.symptom_record import SymptomRecordFactory
+from allergy.models import SymptomEntry, SymptomType
+from tests.factories.symptom_entry import SymptomEntryFactory
 from tests.factories.symptom_type import SymptomTypeFactory
 from tests.factories.user import UserFactory
+
+
+@pytest.mark.django_db()
+def test_delete_symptom(authenticated_client: Client, user: User) -> None:
+    # GIVEN
+    endpoint = reverse("delete_symptom")
+
+    symptom_type = SymptomTypeFactory.create(user=user)
+
+    intensity = 1
+
+    today = date.today()
+
+    SymptomEntryFactory.create(
+        symptom_type=symptom_type,
+        intensity=intensity,
+        entry_date=today,
+    )
+
+    payload = {
+        "date": today,
+        "symptom_type": symptom_type.uuid,
+    }
+
+    # WHEN
+    response = authenticated_client.post(endpoint, payload)
+
+    # THEN
+    assert response.status_code == HTTPStatus.NO_CONTENT
+    assert SymptomEntry.objects.count() == 0
+    assert SymptomType.objects.count() == 1
+
+
+@pytest.mark.django_db()
+def test_delete_symptom_for_the_exact_day(authenticated_client: Client, user: User) -> None:
+    # GIVEN
+    endpoint = reverse("delete_symptom")
+
+    symptom_type = SymptomTypeFactory.create(user=user)
+
+    intensity = 1
+
+    today = date.today()
+    yesterday = today - timedelta(days=1)
+
+    SymptomEntryFactory.create(
+        symptom_type=symptom_type,
+        intensity=intensity,
+        entry_date=today,
+    )
+    SymptomEntryFactory.create(
+        symptom_type=symptom_type,
+        intensity=intensity,
+        entry_date=yesterday,
+    )
+
+    payload = {
+        "date": today,
+        "symptom_type": symptom_type.uuid,
+    }
+
+    # WHEN
+    response = authenticated_client.post(endpoint, payload)
+
+    # THEN
+    assert response.status_code == HTTPStatus.NO_CONTENT
+    assert SymptomEntry.objects.count() == 1
+    assert SymptomType.objects.count() == 1
 
 
 @pytest.mark.django_db()
@@ -78,80 +145,6 @@ def test_delete_symptom_some_missing_from_payload(authenticated_client: Client) 
 
 
 @pytest.mark.django_db()
-def test_delete_symptom_deletes_symptom_record(authenticated_client: Client, user: User) -> None:
-    # GIVEN
-    endpoint = reverse("delete_symptom")
-
-    symptom_type_1 = SymptomTypeFactory.create(user=user)
-    symptom_type_2 = SymptomTypeFactory.create(user=user)
-
-    intensity = 1
-
-    today = date.today()
-
-    entry = AllergyEntryFactory.create(entry_date=today, user=user)
-
-    SymptomRecordFactory.create(
-        symptom_type=symptom_type_1,
-        intensity=intensity,
-        entry=entry,
-    )
-    SymptomRecordFactory.create(
-        symptom_type=symptom_type_2,
-        intensity=intensity,
-        entry=entry,
-    )
-
-    assert SymptomRecord.objects.count() == 2
-
-    payload = {
-        "date": today,
-        "symptom_type": symptom_type_1.uuid,
-    }
-
-    # WHEN
-    response = authenticated_client.post(endpoint, payload)
-
-    # THEN
-    assert response.status_code == HTTPStatus.NO_CONTENT
-    assert SymptomRecord.objects.count() == 1
-    assert AllergyEntry.objects.count() == 1
-    assert SymptomType.objects.count() == 2
-
-
-@pytest.mark.django_db()
-def test_delete_symptom_deletes_allergy_entry(authenticated_client: Client, user: User) -> None:
-    # GIVEN
-    endpoint = reverse("delete_symptom")
-
-    symptom_type = SymptomTypeFactory.create(user=user)
-
-    intensity = 1
-
-    today = date.today()
-
-    SymptomRecordFactory.create(
-        symptom_type=symptom_type,
-        intensity=intensity,
-        entry__user=user,
-    )
-
-    payload = {
-        "date": today,
-        "symptom_type": symptom_type.uuid,
-    }
-
-    # WHEN
-    response = authenticated_client.post(endpoint, payload)
-
-    # THEN
-    assert response.status_code == HTTPStatus.NO_CONTENT
-    assert SymptomRecord.objects.count() == 0
-    assert AllergyEntry.objects.count() == 0
-    assert SymptomType.objects.count() == 1
-
-
-@pytest.mark.django_db()
 def test_delete_symptom_cannot_delete_of_other_user(authenticated_client: Client, user: User) -> None:
     # GIVEN
     endpoint = reverse("delete_symptom")
@@ -161,18 +154,18 @@ def test_delete_symptom_cannot_delete_of_other_user(authenticated_client: Client
     second_user = UserFactory.create()
     symptom_type_second_user = SymptomTypeFactory.create(user=second_user)
 
-    SymptomRecordFactory.create(
+    SymptomEntryFactory.create(
         symptom_type=symptom_type_second_user,
         intensity=intensity,
-        entry__user=second_user,
+        user=second_user,
     )
 
     symptom_type = SymptomTypeFactory.create(user=user)
 
-    SymptomRecordFactory.create(
+    SymptomEntryFactory.create(
         symptom_type=symptom_type,
         intensity=intensity,
-        entry__user=user,
+        user=user,
     )
 
     payload = {
@@ -186,11 +179,8 @@ def test_delete_symptom_cannot_delete_of_other_user(authenticated_client: Client
     # THEN
     assert response.status_code == HTTPStatus.NO_CONTENT
 
-    assert SymptomRecord.objects.filter(entry__user=second_user).count() == 1
-    assert SymptomRecord.objects.filter(entry__user=user).count() == 0
-
-    assert AllergyEntry.objects.filter(user=second_user).count() == 1
-    assert AllergyEntry.objects.filter(user=user).count() == 0
+    assert SymptomEntry.objects.filter(user=second_user).count() == 1
+    assert SymptomEntry.objects.filter(user=user).count() == 0
 
     assert SymptomType.objects.filter(user=second_user).count() == 1
     assert SymptomType.objects.filter(user=user).count() == 1
