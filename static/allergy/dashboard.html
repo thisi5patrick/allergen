@@ -31,24 +31,12 @@
             <div class="w-auto bg-white rounded-lg shadow-md p-4">
                 <h2 class="text-lg font-medium text-gray-800 mb-3">Allergy Symptoms</h2>
                 <div class="flex flex-nowrap space-x-2">
-                    <button class="symptom-button flex items-center bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-2 rounded-full transition duration-200 whitespace-nowrap" data-symptom="SNEEZING">
-                        <i class="fas fa-wind mr-2"></i>
-                        Sneezing
-                    </button>
-                    <button class="symptom-button flex items-center bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-2 rounded-full transition duration-200 whitespace-nowrap" data-symptom="RUNNY_NOSE">
-                        <i class="fas fa-droplet mr-2"></i>
-                        Runny nose
-                    </button>
-                    <button class="symptom-button flex items-center bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-2 rounded-full transition duration-200 whitespace-nowrap" data-symptom="ITCHY_EYES">
-                        <i class="fas fa-eye mr-2"></i>
-                        Itchy eyes
-                    </button>
-                    <button class="symptom-button flex items-center bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-2 rounded-full transition duration-200 whitespace-nowrap" data-symptom="HEADACHE">
-                        <i class="fas fa-head-side-virus mr-2"></i>
-                        Headache
-                    </button>
+                    {% for symptom_type in symptom_types %}
+                        <button class="symptom-button flex items-center bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-2 rounded-full transition duration-200 whitespace-nowrap" data-symptom="{{ symptom_type.uuid }}">
+                            {{ symptom_type.name }}
+                        </button>
+                    {% endfor %}
                 </div>
-
                 <input type="hidden" id="csrfToken" value="{{ csrf_token }}">
 
                 <div id="intensitySelectors" class="mt-4 space-y-3 hidden"></div>

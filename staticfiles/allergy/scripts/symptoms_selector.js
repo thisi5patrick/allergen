@@ -151,7 +151,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
             intensityButton.addEventListener('htmx:configRequest', function(evt) {
                 const hxData = {
-                    symptom: symptom,
+                    symptom_type: symptom,
                     intensity: i,
                     date: currentSelectedDate
                 };

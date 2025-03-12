@@ -6,6 +6,7 @@ from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_POST
 from django_htmx.http import HttpResponseClientRedirect, trigger_client_event
 
+from allergy.models import SymptomType
 from core.forms import RegistrationForm
 
 
@@ -66,6 +67,16 @@ def registration_process(request: HttpRequest) -> HttpResponse:
             password=form.cleaned_data["password"],
         )
         user.save()
+
+        SymptomType.objects.bulk_create(
+            [
+                SymptomType(user=user, name="Sneezing"),
+                SymptomType(user=user, name="Runny nose"),
+                SymptomType(user=user, name="Itchy eyes"),
+                SymptomType(user=user, name="Headache"),
+            ]
+        )
+
         login(request, user)
 
         return HttpResponseClientRedirect("/dashboard/")

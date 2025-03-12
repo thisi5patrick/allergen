@@ -9,7 +9,7 @@ from django.views.decorators.http import require_GET, require_POST
 from django_htmx.http import trigger_client_event
 
 from allergy.forms import AddSymptomForm, DeleteSymptomForm
-from allergy.models import AllergyEntry
+from allergy.models import AllergyEntry, SymptomType
 
 
 def redirect_to_dashboard(request: HttpRequest) -> HttpResponse:
@@ -17,7 +17,10 @@ def redirect_to_dashboard(request: HttpRequest) -> HttpResponse:
 
 
 def dashboard(request: HttpRequest) -> HttpResponse:
-    return render(request, "allergy/dashboard.html")
+    user = cast(User, request.user)
+
+    symptom_types = SymptomType.objects.filter(user=user).all()
+    return render(request, "allergy/dashboard.html", {"symptom_types": symptom_types})
 
 
 @require_GET
