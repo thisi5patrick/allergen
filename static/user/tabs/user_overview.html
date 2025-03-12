@@ -45,7 +45,7 @@
                     {% for symptom in recent_symptoms %}
                     <div class="flex items-center">
                         <div class="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
-                        <p class="text-gray-700 text-sm sm:text-base">{{ symptom.get_symptom_display }} (Intensity: {{ symptom.intensity }}) - {{ symptom.entry.entry_date|date:"M d, Y" }}</p>
+                        <p class="text-gray-700 text-sm sm:text-base">{{ symptom.symptom_type.name }} (Intensity: {{ symptom.intensity }}) - {{ symptom.entry.entry_date|date:"M d, Y" }}</p>
                     </div>
                     {% endfor %}
                 </div>
@@ -62,7 +62,7 @@
                     <div class="flex flex-wrap gap-2">
                         {% for symptom in top_symptoms %}
                         <span class="bg-white px-3 py-1 rounded-full text-sm border border-green-200 text-gray-700">
-                            {{ symptom.get_symptom_display }} ({{ symptom.count }})
+                            {{ symptom.symptom_type__name }} ({{ symptom.count }})
                         </span>
                         {% endfor %}
                     </div>

@@ -9,5 +9,5 @@ class SymptomTypeFactory(factory.django.DjangoModelFactory[SymptomType]):
     class Meta:
         model = SymptomType
 
-    name = factory.fuzzy.FuzzyText(length=255)
+    name = factory.fuzzy.FuzzyText(length=10)
     user = factory.SubFactory(UserFactory)
