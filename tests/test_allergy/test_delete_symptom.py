@@ -1,15 +1,16 @@
 from datetime import date
 from http import HTTPStatus
-from typing import cast
 
 import pytest
 from django.contrib.auth.models import User
-from django.template import RequestContext
 from django.test import Client
 from django.urls import reverse
 
-from allergy.models import AllergyEntries, AllergySymptoms
-from tests.factories.allergy_symptoms import AllergySymptomsFactory
+from allergy.models import AllergyEntry, SymptomRecord, SymptomType
+from tests.factories.allergy_entry import AllergyEntryFactory
+from tests.factories.symptom_record import SymptomRecordFactory
+from tests.factories.symptom_type import SymptomTypeFactory
+from tests.factories.user import UserFactory
 
 
 @pytest.mark.django_db()
@@ -52,7 +53,7 @@ def test_delete_symptom_all_missing_from_payload(authenticated_client: Client) -
     form = response.context["form"]
 
     assert "This field is required." in form.errors["date"]
-    assert "This field is required." in form.errors["symptom"]
+    assert "This field is required." in form.errors["symptom_type"]
 
 
 @pytest.mark.django_db()
@@ -73,48 +74,49 @@ def test_delete_symptom_some_missing_from_payload(authenticated_client: Client) 
     form = response.context["form"]
 
     assert "date" not in form.errors
-    assert "This field is required." in form.errors["symptom"]
+    assert "This field is required." in form.errors["symptom_type"]
 
 
-@pytest.mark.parametrize(
-    ("payload", "field", "expected_error"),
-    [
-        (
-            {
-                "date": "incorrect_format",
-                "symptom": AllergySymptoms.Symptoms.HEADACHE,
-            },
-            "date",
-            "Enter a valid date.",
-        ),
-        (
-            {
-                "date": date.today(),
-                "symptom": "Incorrect symptom",
-            },
-            "symptom",
-            "Select a valid choice. Incorrect symptom is not one of the available choices.",
-        ),
-    ],
-)
 @pytest.mark.django_db()
-def test_delete_symptom_incorrect_form_of_payload(
-    payload: dict[str, str], field: str, expected_error: str, authenticated_client: Client
-) -> None:
+def test_delete_symptom_deletes_symptom_record(authenticated_client: Client, user: User) -> None:
     # GIVEN
     endpoint = reverse("delete_symptom")
+
+    symptom_type_1 = SymptomTypeFactory.create(user=user)
+    symptom_type_2 = SymptomTypeFactory.create(user=user)
+
+    intensity = 1
+
+    today = date.today()
+
+    entry = AllergyEntryFactory.create(entry_date=today, user=user)
+
+    SymptomRecordFactory.create(
+        symptom_type=symptom_type_1,
+        intensity=intensity,
+        entry=entry,
+    )
+    SymptomRecordFactory.create(
+        symptom_type=symptom_type_2,
+        intensity=intensity,
+        entry=entry,
+    )
+
+    assert SymptomRecord.objects.count() == 2
+
+    payload = {
+        "date": today,
+        "symptom_type": symptom_type_1.uuid,
+    }
 
     # WHEN
     response = authenticated_client.post(endpoint, payload)
 
     # THEN
-    assert response.status_code == HTTPStatus.OK
-
-    form = response.context["form"]
-    assert form.errors[field] == [expected_error]
-
-    context = cast(RequestContext, response.context)
-    assert context.template_name == "allergy/partials/symptom_error.html"
+    assert response.status_code == HTTPStatus.NO_CONTENT
+    assert SymptomRecord.objects.count() == 1
+    assert AllergyEntry.objects.count() == 1
+    assert SymptomType.objects.count() == 2
 
 
 @pytest.mark.django_db()
@@ -122,26 +124,21 @@ def test_delete_symptom_deletes_allergy_entry(authenticated_client: Client, user
     # GIVEN
     endpoint = reverse("delete_symptom")
 
-    symptom = AllergySymptoms.Symptoms.HEADACHE
+    symptom_type = SymptomTypeFactory.create(user=user)
+
     intensity = 1
 
-    AllergySymptomsFactory.create(
-        symptom=symptom,
+    today = date.today()
+
+    SymptomRecordFactory.create(
+        symptom_type=symptom_type,
         intensity=intensity,
         entry__user=user,
     )
 
-    assert AllergySymptoms.objects.count() == 1
-
-    allergy_symptom = AllergyEntries.objects.first()
-
-    assert allergy_symptom is not None
-    allergy_symptom.delete()
-    assert AllergyEntries.objects.count() == 0
-
     payload = {
-        "date": date.today(),
-        "symptom": symptom,
+        "date": today,
+        "symptom_type": symptom_type.uuid,
     }
 
     # WHEN
@@ -149,29 +146,38 @@ def test_delete_symptom_deletes_allergy_entry(authenticated_client: Client, user
 
     # THEN
     assert response.status_code == HTTPStatus.NO_CONTENT
-
-    assert AllergySymptoms.objects.count() == 0
-    assert AllergyEntries.objects.count() == 0
+    assert SymptomRecord.objects.count() == 0
+    assert AllergyEntry.objects.count() == 0
+    assert SymptomType.objects.count() == 1
 
 
 @pytest.mark.django_db()
-def test_delete_symptom_deletes_allergy_symptoms(authenticated_client: Client, user: User) -> None:
+def test_delete_symptom_cannot_delete_of_other_user(authenticated_client: Client, user: User) -> None:
     # GIVEN
     endpoint = reverse("delete_symptom")
+    intensity = 1
+    today = date.today()
 
-    symptom = AllergySymptoms.Symptoms.HEADACHE
+    second_user = UserFactory.create()
+    symptom_type_second_user = SymptomTypeFactory.create(user=second_user)
 
-    AllergySymptomsFactory.create(
-        symptom=symptom,
+    SymptomRecordFactory.create(
+        symptom_type=symptom_type_second_user,
+        intensity=intensity,
+        entry__user=second_user,
+    )
+
+    symptom_type = SymptomTypeFactory.create(user=user)
+
+    SymptomRecordFactory.create(
+        symptom_type=symptom_type,
+        intensity=intensity,
         entry__user=user,
     )
 
-    assert AllergySymptoms.objects.count() == 1
-    assert AllergyEntries.objects.count() == 1
-
     payload = {
-        "date": date.today(),
-        "symptom": symptom,
+        "date": today,
+        "symptom_type": symptom_type.uuid,
     }
 
     # WHEN
@@ -179,5 +185,12 @@ def test_delete_symptom_deletes_allergy_symptoms(authenticated_client: Client, u
 
     # THEN
     assert response.status_code == HTTPStatus.NO_CONTENT
-    assert AllergySymptoms.objects.count() == 0
-    assert AllergyEntries.objects.count() == 0
+
+    assert SymptomRecord.objects.filter(entry__user=second_user).count() == 1
+    assert SymptomRecord.objects.filter(entry__user=user).count() == 0
+
+    assert AllergyEntry.objects.filter(user=second_user).count() == 1
+    assert AllergyEntry.objects.filter(user=user).count() == 0
+
+    assert SymptomType.objects.filter(user=second_user).count() == 1
+    assert SymptomType.objects.filter(user=user).count() == 1

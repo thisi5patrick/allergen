@@ -3,16 +3,16 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_GET
 
-from allergy.models import AllergyEntries, AllergySymptoms
+from allergy.models import AllergyEntry, SymptomRecord
 
 
 @require_GET
 def user_overview(request: HttpRequest) -> HttpResponse:
     days_with_symptoms = (
-        AllergyEntries.objects.filter(user_id=request.user.id).annotate(count=Count("entry_date")).count()
+        AllergyEntry.objects.filter(user_id=request.user.id).annotate(count=Count("entry_date")).count()
     )
-    total_entries = AllergySymptoms.objects.filter(entry__user_id=request.user.id).count()
-    recent_symptoms = AllergySymptoms.objects.filter(entry__user_id=request.user.id).order_by("-created_at").all()[:5]
+    total_entries = SymptomRecord.objects.filter(entry__user_id=request.user.id).count()
+    recent_symptoms = SymptomRecord.objects.filter(entry__user_id=request.user.id).order_by("-created_at").all()[:5]
     top_symptoms = None  # TODO: add top symptoms
     context = {
         "days_with_symptoms": days_with_symptoms,

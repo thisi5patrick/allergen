@@ -9,7 +9,7 @@ from django.views.decorators.http import require_GET, require_POST
 from django_htmx.http import trigger_client_event
 
 from allergy.forms import AddSymptomForm, DeleteSymptomForm
-from allergy.models import AllergyEntries
+from allergy.models import AllergyEntry
 
 
 def redirect_to_dashboard(request: HttpRequest) -> HttpResponse:
@@ -25,9 +25,9 @@ def get_calendar(request: HttpRequest, year: int, month: int, day: int) -> HttpR
     selected_date = date(year, month, day)
 
     user = cast(User, request.user)
-    entry = AllergyEntries.objects.filter(user=user, entry_date=selected_date).first()
+    entry = AllergyEntry.objects.filter(user=user, entry_date=selected_date).first()
 
-    allergies = entry.symptoms.all() if entry else []
+    allergies = entry.symptom_records.all() if entry else []
 
     response = render(
         request, "allergy/partials/allergy_symptoms.html", {"allergies": allergies, "selected_date": selected_date}
@@ -50,7 +50,7 @@ def add_symptom(request: HttpRequest) -> HttpResponse:
     entry = form.save()
     selected_date = form.cleaned_data["date"]
 
-    allergies = entry.symptoms.all()
+    allergies = entry.symptom_records.all()
 
     response = render(
         request,

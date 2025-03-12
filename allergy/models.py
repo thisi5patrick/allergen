@@ -10,7 +10,6 @@ from django.db.models import (
     ForeignKey,
     IntegerField,
     Model,
-    TextChoices,
     UUIDField,
 )
 
@@ -23,7 +22,7 @@ class TimestampedModelMixin(Model):
         abstract = True
 
 
-class AllergyEntries(TimestampedModelMixin):
+class AllergyEntry(TimestampedModelMixin):
     uuid = UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = ForeignKey(User, on_delete=CASCADE)
     entry_date = DateField()
@@ -32,17 +31,20 @@ class AllergyEntries(TimestampedModelMixin):
         return f"{self.user} - {self.entry_date}"
 
 
-class AllergySymptoms(TimestampedModelMixin):
-    class Symptoms(TextChoices):
-        SNEEZING = "SNEEZING", "Sneezing"
-        RUNNY_NOSE = "RUNNY_NOSE", "Runny nose"
-        ITCHY_EYES = "ITCHY_EYES", "Itchy eyes"
-        HEADACHE = "HEADACHE", "Headache"
-
+class SymptomType(TimestampedModelMixin):
     uuid = UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    symptom = CharField(max_length=255, choices=Symptoms.choices)
-    intensity = IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)])
-    entry = ForeignKey(AllergyEntries, on_delete=CASCADE, related_name="symptoms")
+    name = CharField(max_length=255)
+    user = ForeignKey(User, on_delete=CASCADE)
 
     def __str__(self) -> str:
-        return f"{self.symptom} - {self.intensity}"
+        return self.name
+
+
+class SymptomRecord(TimestampedModelMixin):
+    uuid = UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    symptom_type = ForeignKey(SymptomType, on_delete=CASCADE, related_name="symptom_records")
+    intensity = IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)])
+    entry = ForeignKey(AllergyEntry, on_delete=CASCADE, related_name="symptom_records")
+
+    def __str__(self) -> str:
+        return f"{self.symptom_type.name} - {self.intensity}"

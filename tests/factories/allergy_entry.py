@@ -2,13 +2,13 @@ from datetime import date
 
 import factory
 
-from allergy.models import AllergyEntries
+from allergy.models import AllergyEntry
 from tests.factories.user import UserFactory
 
 
-class AllergyEntriesFactory(factory.django.DjangoModelFactory[AllergyEntries]):
+class AllergyEntryFactory(factory.django.DjangoModelFactory[AllergyEntry]):
     class Meta:
-        model = AllergyEntries
+        model = AllergyEntry
 
     entry_date = factory.LazyFunction(lambda: date.today())
     user = factory.SubFactory(UserFactory)

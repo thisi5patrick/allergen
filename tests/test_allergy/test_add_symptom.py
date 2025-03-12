@@ -1,6 +1,6 @@
 from datetime import date
 from http import HTTPStatus
-from typing import cast
+from typing import Any, Callable, cast
 
 import pytest
 from django.contrib.auth.models import User
@@ -8,8 +8,19 @@ from django.template import RequestContext
 from django.test import Client
 from django.urls import reverse
 
-from allergy.models import AllergyEntries, AllergySymptoms
-from tests.factories.allergy_symptoms import AllergySymptomsFactory
+from allergy.models import AllergyEntry, SymptomRecord, SymptomType
+from tests.factories.symptom_record import SymptomRecordFactory
+from tests.factories.symptom_type import SymptomTypeFactory
+
+
+@pytest.fixture()
+def create_symptom_type() -> Callable[[], SymptomType]:
+    def _create_symptom_type() -> SymptomType:
+        from tests.factories.symptom_type import SymptomTypeFactory
+
+        return SymptomTypeFactory.create()
+
+    return _create_symptom_type
 
 
 @pytest.mark.django_db()
@@ -52,12 +63,12 @@ def test_add_symptom_all_missing_from_payload(authenticated_client: Client) -> N
     form = response.context["form"]
 
     assert "This field is required." in form.errors["date"]
-    assert "This field is required." in form.errors["symptom"]
+    assert "This field is required." in form.errors["symptom_type"]
     assert "This field is required." in form.errors["intensity"]
 
 
 @pytest.mark.django_db()
-def test_add_symptom_some_missing_from_payload(authenticated_client: Client) -> None:
+def test_add_symptom_some_missing_from_payload(authenticated_client: Client, user: User) -> None:
     # GIVEN
     endpoint = reverse("add_symptom")
 
@@ -76,43 +87,44 @@ def test_add_symptom_some_missing_from_payload(authenticated_client: Client) -> 
 
     assert "date" not in form.errors
     assert "intensity" not in form.errors
-    assert "This field is required." in form.errors["symptom"]
+    assert "This field is required." in form.errors["symptom_type"]
 
 
+@pytest.mark.django_db()
 @pytest.mark.parametrize(
-    ("payload", "field", "expected_error"),
+    ("payload_factory", "field", "expected_error"),
     [
         (
-            {
+            lambda create_symptom_type: {
                 "date": "incorrect_format",
-                "symptom": AllergySymptoms.Symptoms.HEADACHE,
+                "symptom_type": create_symptom_type().name,
                 "intensity": 1,
             },
             "date",
             "Enter a valid date.",
         ),
         (
-            {
+            lambda create_symptom_type: {
                 "date": date.today(),
-                "symptom": "Incorrect symptom",
+                "symptom_type": "not-a-valid-uuid",
                 "intensity": 1,
             },
-            "symptom",
-            "Select a valid choice. Incorrect symptom is not one of the available choices.",
+            "symptom_type",
+            "“not-a-valid-uuid” is not a valid UUID.",
         ),
         (
-            {
+            lambda create_symptom_type: {
                 "date": date.today(),
-                "symptom": AllergySymptoms.Symptoms.HEADACHE,
+                "symptom_type": create_symptom_type().name,
                 "intensity": 0,
             },
             "intensity",
             "Ensure this value is greater than or equal to 1.",
         ),
         (
-            {
+            lambda create_symptom_type: {
                 "date": date.today(),
-                "symptom": AllergySymptoms.Symptoms.HEADACHE,
+                "symptom_type": create_symptom_type().name,
                 "intensity": 15,
             },
             "intensity",
@@ -120,12 +132,16 @@ def test_add_symptom_some_missing_from_payload(authenticated_client: Client) -> 
         ),
     ],
 )
-@pytest.mark.django_db()
 def test_add_symptom_incorrect_form_of_payload(
-    payload: dict[str, str], field: str, expected_error: str, authenticated_client: Client
+    payload_factory: Callable[[Any], dict[Any, Any]],
+    field: str,
+    expected_error: str,
+    authenticated_client: Client,
+    create_symptom_type: Callable[[], SymptomType],
 ) -> None:
     # GIVEN
     endpoint = reverse("add_symptom")
+    payload = payload_factory(create_symptom_type)
 
     # WHEN
     response = authenticated_client.post(endpoint, payload)
@@ -145,21 +161,21 @@ def test_add_symptom_does_not_duplicate_allergy_symptom(authenticated_client: Cl
     # GIVEN
     endpoint = reverse("add_symptom")
 
-    symptom = AllergySymptoms.Symptoms.HEADACHE
+    symptom_type = SymptomTypeFactory.create()
     intensity = 1
 
-    AllergySymptomsFactory.create(
-        symptom=symptom,
+    SymptomRecordFactory.create(
+        symptom_type=symptom_type,
         intensity=intensity,
         entry__user=user,
     )
 
-    assert AllergySymptoms.objects.count() == 1
+    assert SymptomRecord.objects.count() == 1
 
     payload = {
         "date": date.today(),
         "intensity": intensity,
-        "symptom": symptom,
+        "symptom_type": symptom_type,
     }
 
     # WHEN
@@ -169,10 +185,10 @@ def test_add_symptom_does_not_duplicate_allergy_symptom(authenticated_client: Cl
     assert response.status_code == HTTPStatus.OK
 
     context = cast(RequestContext, response.context)
-    assert context.template_name == "allergy/partials/allergy_symptoms.html"
+    assert context.template_name == "allergy/partials/symptom_error.html"
 
-    assert AllergySymptoms.objects.count() == 1
-    assert AllergyEntries.objects.count() == 1
+    assert SymptomRecord.objects.count() == 1
+    assert AllergyEntry.objects.count() == 1
 
 
 @pytest.mark.django_db()
@@ -180,27 +196,27 @@ def test_add_symptom_creates_allergy_entry(authenticated_client: Client, user: U
     # GIVEN
     endpoint = reverse("add_symptom")
 
-    symptom = AllergySymptoms.Symptoms.HEADACHE
+    symptom_type = SymptomTypeFactory.create(user=user)
     intensity = 1
 
-    AllergySymptomsFactory.create(
-        symptom=symptom,
+    SymptomRecordFactory.create(
+        symptom_type=symptom_type,
         intensity=intensity,
         entry__user=user,
     )
 
-    assert AllergySymptoms.objects.count() == 1
+    assert SymptomRecord.objects.count() == 1
 
-    allergy_symptom = AllergyEntries.objects.first()
+    allergy_entry = AllergyEntry.objects.first()
 
-    assert allergy_symptom is not None
-    allergy_symptom.delete()
-    assert AllergyEntries.objects.count() == 0
+    assert allergy_entry is not None
+    allergy_entry.delete()
+    assert AllergyEntry.objects.count() == 0
 
     payload = {
         "date": date.today(),
         "intensity": intensity,
-        "symptom": symptom,
+        "symptom_type": symptom_type.uuid,
     }
 
     # WHEN
@@ -212,8 +228,8 @@ def test_add_symptom_creates_allergy_entry(authenticated_client: Client, user: U
     context = cast(RequestContext, response.context)
     assert context.template_name == "allergy/partials/allergy_symptoms.html"
 
-    assert AllergySymptoms.objects.count() == 1
-    assert AllergyEntries.objects.count() == 1
+    assert SymptomRecord.objects.count() == 1
+    assert AllergyEntry.objects.count() == 1
 
 
 @pytest.mark.django_db()
@@ -221,16 +237,11 @@ def test_add_symptom_creates_multiple_allergy_symptoms(authenticated_client: Cli
     # GIVEN
     endpoint = reverse("add_symptom")
 
-    num_of_final_symptoms = 2
+    symptom_1 = SymptomTypeFactory.create(user=user)
     payload_1 = {
         "date": date.today(),
         "intensity": 1,
-        "symptom": AllergySymptoms.Symptoms.HEADACHE,
-    }
-    payload_2 = {
-        "date": date.today(),
-        "intensity": 1,
-        "symptom": AllergySymptoms.Symptoms.ITCHY_EYES,
+        "symptom_type": symptom_1.uuid,
     }
 
     # WHEN
@@ -238,18 +249,25 @@ def test_add_symptom_creates_multiple_allergy_symptoms(authenticated_client: Cli
 
     # THEN
     assert response.status_code == HTTPStatus.OK
-    assert AllergySymptoms.objects.count() == 1
-
-    assert AllergyEntries.objects.count() == 1
+    assert AllergyEntry.objects.count() == 1
+    assert SymptomType.objects.count() == 1
+    assert SymptomRecord.objects.count() == 1
 
     # WHEN
+    symptom_2 = SymptomTypeFactory.create(user=user)
+    payload_2 = {
+        "date": date.today(),
+        "intensity": 1,
+        "symptom_type": symptom_2.uuid,
+    }
+
     response = authenticated_client.post(endpoint, payload_2)
 
     # THEN
     assert response.status_code == HTTPStatus.OK
-    assert AllergySymptoms.objects.count() == num_of_final_symptoms
-
-    assert AllergyEntries.objects.count() == 1
+    assert AllergyEntry.objects.count() == 1
+    assert SymptomRecord.objects.count() == 2
+    assert SymptomType.objects.count() == 2
 
 
 @pytest.mark.django_db()
@@ -257,10 +275,10 @@ def test_add_symptom_updates_allergy_symptoms(authenticated_client: Client, user
     # GIVEN
     endpoint = reverse("add_symptom")
 
-    symptom = AllergySymptoms.Symptoms.HEADACHE
+    symptom_type = SymptomTypeFactory.create(user=user)
 
-    AllergySymptomsFactory.create(
-        symptom=symptom,
+    SymptomRecordFactory.create(
+        symptom_type=symptom_type,
         intensity=1,
         entry__user=user,
     )
@@ -269,7 +287,7 @@ def test_add_symptom_updates_allergy_symptoms(authenticated_client: Client, user
     payload = {
         "date": date.today(),
         "intensity": new_intensity,
-        "symptom": symptom,
+        "symptom_type": symptom_type.uuid,
     }
 
     # WHEN
@@ -277,10 +295,10 @@ def test_add_symptom_updates_allergy_symptoms(authenticated_client: Client, user
 
     # THEN
     assert response.status_code == HTTPStatus.OK
-    assert AllergySymptoms.objects.count() == 1
+    assert SymptomRecord.objects.count() == 1
 
-    allergy_symptom = AllergySymptoms.objects.first()
+    allergy_symptom = SymptomRecord.objects.first()
 
     assert allergy_symptom is not None
-    assert allergy_symptom.symptom == symptom
+    assert allergy_symptom.symptom_type == symptom_type
     assert allergy_symptom.intensity == new_intensity
