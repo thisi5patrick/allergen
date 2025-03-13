@@ -7,7 +7,7 @@ from django.views.decorators.http import require_GET, require_POST
 from django_htmx.http import HttpResponseClientRedirect, trigger_client_event
 
 from allergy.models import SymptomType
-from core.forms import RegistrationForm
+from core.forms.registration import RegistrationForm
 
 
 def view_404(request: HttpRequest, exception: None | Exception = None) -> HttpResponse:
