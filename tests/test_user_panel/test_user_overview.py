@@ -12,9 +12,9 @@ from tests.factories.symptom_type import SymptomTypeFactory
 
 
 @pytest.mark.django_db()
-def test_get_user_overview(authenticated_client: Client, user: User) -> None:
+def test_overview_view(authenticated_client: Client, user: User) -> None:
     # GIVEN
-    endpoint = reverse("user_overview")
+    endpoint = reverse("overview_view")
 
     today = date.today()
     yesterday = date.today() - timedelta(days=1)
@@ -40,11 +40,11 @@ def test_get_user_overview(authenticated_client: Client, user: User) -> None:
 
 @pytest.mark.django_db()
 @pytest.mark.parametrize("number_of_symptoms", [2, 10, 50, 500])
-def test_get_user_overview_with_consistent_query_numbers(
+def test_overview_view_with_consistent_query_numbers(
     number_of_symptoms: int, authenticated_client: Client, django_assert_num_queries: DjangoAssertNumQueries, user: User
 ) -> None:
     # GIVEN
-    endpoint = reverse("user_overview")
+    endpoint = reverse("overview_view")
 
     SymptomEntryFactory.create_batch(number_of_symptoms, user=user, symptom_type__user=user)
 

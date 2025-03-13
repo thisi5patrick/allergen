@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 
 import environ
+from django.urls import reverse_lazy
 
 env = environ.Env(
     DEBUG=(bool, False),
@@ -141,6 +142,6 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-LOGIN_URL = "login"
+LOGIN_URL = reverse_lazy("login_view")
 LOGIN_REDIRECT_URL = "dashboard"
 APPEND_SLASH = True

@@ -10,7 +10,7 @@ from allergy.models import SymptomEntry
 
 
 @require_GET
-def user_overview(request: HttpRequest) -> HttpResponse:
+def overview_view(request: HttpRequest) -> HttpResponse:
     user = cast(User, request.user)
 
     entries = SymptomEntry.objects.filter(user=user)
@@ -32,25 +32,25 @@ def user_overview(request: HttpRequest) -> HttpResponse:
 
 
 @require_GET
-def user_symptoms(request: HttpRequest) -> HttpResponse:
+def symptoms_view(request: HttpRequest) -> HttpResponse:
     return render(request, "user/tabs/user_symptoms.html", {"active_tab": "symptoms"})
 
 
 @require_GET
-def user_food_allergies(request: HttpRequest) -> HttpResponse:
+def food_allergies_view(request: HttpRequest) -> HttpResponse:
     return render(request, "user/tabs/user_overview.html", {"active_tab": "food_allergies"})
 
 
 @require_GET
-def user_medications(request: HttpRequest) -> HttpResponse:
+def medications_view(request: HttpRequest) -> HttpResponse:
     return render(request, "user/tabs/user_overview.html", {"active_tab": "medications"})
 
 
 @require_GET
-def change_password(request: HttpRequest) -> HttpResponse:
+def change_password_view(request: HttpRequest) -> HttpResponse:
     return render(request, "user/tabs/user_overview.html", {"active_tab": "change_password"})
 
 
 @require_GET
-def delete_account(request: HttpRequest) -> HttpResponse:
+def delete_account_view(request: HttpRequest) -> HttpResponse:
     return render(request, "user/tabs/user_overview.html", {"active_tab": "delete_account"})

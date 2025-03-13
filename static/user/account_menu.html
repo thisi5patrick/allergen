@@ -3,38 +3,38 @@
 
     <div class="lg:hidden mb-4">
         <select id="mobileNavSelect" class="w-full p-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent" onchange="window.location.href=this.value">
-            <option value="{% url 'user_overview' %}" {% if active_tab == 'overview' %}selected{% endif %}>Account Overview</option>
-            <option value="{% url 'user_symptoms' %}" {% if active_tab == 'symptoms' %}selected{% endif %}>Symptoms</option>
-            <option value="{% url 'user_food_allergies' %}" {% if active_tab == 'food' %}selected{% endif %}>Food Allergies</option>
-            <option value="{% url 'user_medications' %}" {% if active_tab == 'medications' %}selected{% endif %}>Drugs</option>
-            <option value="{% url 'change_password' %}" {% if active_tab == 'password' %}selected{% endif %}>Change Password</option>
-            <option value="{% url 'delete_account' %}" {% if active_tab == 'delete' %}selected{% endif %}>Delete Account</option>
+            <option value="{% url 'overview_view' %}" {% if active_tab == 'overview' %}selected{% endif %}>Account Overview</option>
+            <option value="{% url 'symptoms_view' %}" {% if active_tab == 'symptoms' %}selected{% endif %}>Symptoms</option>
+            <option value="{% url 'food_allergies_view' %}" {% if active_tab == 'food' %}selected{% endif %}>Food Allergies</option>
+            <option value="{% url 'medications_view' %}" {% if active_tab == 'medications' %}selected{% endif %}>Drugs</option>
+            <option value="{% url 'change_password_view' %}" {% if active_tab == 'password' %}selected{% endif %}>Change Password</option>
+            <option value="{% url 'delete_account_view' %}" {% if active_tab == 'delete' %}selected{% endif %}>Delete Account</option>
         </select>
     </div>
 
     <nav class="hidden lg:block space-y-2">
-        <a href="{% url 'user_overview' %}" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition duration-200 {% if active_tab == 'overview' or not active_tab %}bg-purple-100 text-purple-700 font-medium{% endif %}">
+        <a href="{% url 'overview_view' %}" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition duration-200 {% if active_tab == 'overview' or not active_tab %}bg-purple-100 text-purple-700 font-medium{% endif %}">
             <i class="fas fa-user-circle mr-3 text-purple-500"></i>
             <span>Account Overview</span>
         </a>
-        <a href="{% url 'user_symptoms' %}" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition duration-200 {% if active_tab == 'symptoms' %}bg-purple-100 text-purple-700 font-medium{% endif %}">
+        <a href="{% url 'symptoms_view' %}" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition duration-200 {% if active_tab == 'symptoms' %}bg-purple-100 text-purple-700 font-medium{% endif %}">
             <i class="fas fa-lungs mr-3 text-purple-500"></i>
             <span>Symptoms</span>
         </a>
-        <a href="{% url 'user_food_allergies' %}" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition duration-200 {% if active_tab == 'food' %}bg-purple-100 text-purple-700 font-medium{% endif %}">
+        <a href="{% url 'food_allergies_view' %}" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition duration-200 {% if active_tab == 'food' %}bg-purple-100 text-purple-700 font-medium{% endif %}">
             <i class="fas fa-apple-alt mr-3 text-purple-500"></i>
             <span>Food Allergies</span>
         </a>
-        <a href="{% url 'user_medications' %}" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition duration-200 {% if active_tab == 'drugs' %}bg-purple-100 text-purple-700 font-medium{% endif %}">
+        <a href="{% url 'medications_view' %}" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition duration-200 {% if active_tab == 'drugs' %}bg-purple-100 text-purple-700 font-medium{% endif %}">
             <i class="fas fa-pills mr-3 text-purple-500"></i>
             <span>Drugs</span>
         </a>
         <div class="border-t border-gray-200 my-3"></div>
-        <a href="{% url 'change_password' %}" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition duration-200 {% if active_tab == 'password' %}bg-purple-100 text-purple-700 font-medium{% endif %}">
+        <a href="{% url 'change_password_view' %}" class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition duration-200 {% if active_tab == 'password' %}bg-purple-100 text-purple-700 font-medium{% endif %}">
             <i class="fas fa-key mr-3 text-purple-500"></i>
             <span>Change Password</span>
         </a>
-        <a href="{% url 'delete_account' %}" class="flex items-center p-3 rounded-lg text-red-600 hover:bg-red-50 transition duration-200 {% if active_tab == 'delete' %}bg-red-100 font-medium{% endif %}">
+        <a href="{% url 'delete_account_view' %}" class="flex items-center p-3 rounded-lg text-red-600 hover:bg-red-50 transition duration-200 {% if active_tab == 'delete' %}bg-red-100 font-medium{% endif %}">
             <i class="fas fa-user-slash mr-3"></i>
             <span>Delete Account</span>
         </a>

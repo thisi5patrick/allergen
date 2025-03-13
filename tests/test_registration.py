@@ -11,9 +11,9 @@ from allergy.models import SymptomType
 
 
 @pytest.mark.django_db()
-def test_register_user(anonymous_client: Client) -> None:
+def test_registration_process(anonymous_client: Client) -> None:
     # GIVEN
-    endpoint = reverse("register_process")
+    endpoint = reverse("registration_process")
     payload = {
         "username": "name",
         "email": "email@email.com",
@@ -39,9 +39,9 @@ def test_register_user(anonymous_client: Client) -> None:
 
 
 @pytest.mark.django_db()
-def test_register_user_missing_payload(anonymous_client: Client) -> None:
+def test_registration_process_missing_payload(anonymous_client: Client) -> None:
     # GIVEN
-    endpoint = reverse("register_process")
+    endpoint = reverse("registration_process")
     payload = {
         "email": "email@email.com",
         "password": "password",
@@ -97,11 +97,11 @@ def test_register_user_missing_payload(anonymous_client: Client) -> None:
     ],
 )
 @pytest.mark.django_db()
-def test_register_user_incorrect_payload(
+def test_registration_process_incorrect_payload(
     payload: dict[str, str], field: str, error_message: str, anonymous_client: Client
 ) -> None:
     # GIVEN
-    endpoint = reverse("register_process")
+    endpoint = reverse("registration_process")
 
     # WHEN
     response = anonymous_client.post(endpoint, payload)

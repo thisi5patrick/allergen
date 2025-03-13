@@ -9,7 +9,7 @@
                 </div>
 
                 <form
-                    hx-post="{% url 'register_process' %}"
+                    hx-post="{% url 'registration_process' %}"
                     hx-trigger="submit"
                     hx-target="#form-error-messages"
                     hx-swap="innerHTML"
@@ -84,7 +84,7 @@
                     <p class="text-sm text-gray-600">
                         Already have an account?
                         <a
-                            href="{% url 'login' %}"
+                            href="{% url 'login_view' %}"
                             class="font-medium text-purple-600 hover:text-purple-500">
                             Sign in
                         </a>

@@ -13,10 +13,10 @@ from allergy.models import SymptomEntry, SymptomType
 
 
 def redirect_to_dashboard(request: HttpRequest) -> HttpResponse:
-    return redirect("dashboard")
+    return redirect("dashboard_view")
 
 
-def dashboard(request: HttpRequest) -> HttpResponse:
+def dashboard_view(request: HttpRequest) -> HttpResponse:
     user = cast(User, request.user)
 
     symptom_types = SymptomType.objects.filter(user=user).all()
@@ -24,7 +24,7 @@ def dashboard(request: HttpRequest) -> HttpResponse:
 
 
 @require_GET
-def get_calendar(request: HttpRequest, year: int, month: int, day: int) -> HttpResponse:
+def get_calendar_partial(request: HttpRequest, year: int, month: int, day: int) -> HttpResponse:
     selected_date = date(year, month, day)
 
     user = cast(User, request.user)
@@ -37,7 +37,7 @@ def get_calendar(request: HttpRequest, year: int, month: int, day: int) -> HttpR
 
 
 @require_POST
-def add_symptom(request: HttpRequest) -> HttpResponse:
+def add_symptom_partial(request: HttpRequest) -> HttpResponse:
     user = cast(User, request.user)
     form = AddSymptomForm(request.POST, user=user)
     if not form.is_valid():
@@ -67,7 +67,7 @@ def add_symptom(request: HttpRequest) -> HttpResponse:
 
 
 @require_POST
-def delete_symptom(request: HttpRequest) -> HttpResponse:
+def delete_symptom_partial(request: HttpRequest) -> HttpResponse:
     form = DeleteSymptomForm(request.POST, user=request.user)
     if not form.is_valid():
         return render(

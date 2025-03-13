@@ -12,15 +12,15 @@ from core.forms import RegistrationForm
 
 def view_404(request: HttpRequest, exception: None | Exception = None) -> HttpResponse:
     if request.user.is_authenticated:
-        return redirect("dashboard")
-    return redirect("login")
+        return redirect("dashboard_view")
+    return redirect("login_view")
 
 
 @require_GET
 @login_not_required
-def login_page(request: HttpRequest) -> HttpResponse:
+def login_view(request: HttpRequest) -> HttpResponse:
     if request.user.is_authenticated:
-        return redirect("dashboard")
+        return redirect("dashboard_view")
 
     return render(request, "login/login.html")
 
@@ -49,9 +49,9 @@ def login_process(request: HttpRequest) -> HttpResponse:
 
 @require_GET
 @login_not_required
-def registration_page(request: HttpRequest) -> HttpResponse:
+def registration_view(request: HttpRequest) -> HttpResponse:
     if request.user.is_authenticated:
-        return redirect("dashboard")
+        return redirect("dashboard_view")
     return render(request, "registration/registration.html")
 
 
@@ -82,7 +82,7 @@ def registration_process(request: HttpRequest) -> HttpResponse:
         return HttpResponseClientRedirect("/dashboard/")
 
     response = render(request, "registration/registration_error_message.html", {"form": form})
-    return trigger_client_event(response, "register_error")
+    return trigger_client_event(response, "registration_error")
 
 
 @require_POST

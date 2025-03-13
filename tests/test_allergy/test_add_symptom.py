@@ -26,7 +26,7 @@ def create_symptom_type() -> Callable[[], SymptomType]:
 @pytest.mark.django_db()
 def test_add_symptom_creates(authenticated_client: Client, user: User) -> None:
     # GIVEN
-    endpoint = reverse("add_symptom")
+    endpoint = reverse("add_symptom_partial")
 
     symptom_type = SymptomTypeFactory.create(user=user)
     intensity = 1
@@ -53,8 +53,8 @@ def test_add_symptom_creates(authenticated_client: Client, user: User) -> None:
 @pytest.mark.django_db()
 def test_add_symptom_deny_anonymous(anonymous_client: Client) -> None:
     # GIVEN
-    endpoint = reverse("add_symptom")
-    login_endpoint = reverse("login")
+    endpoint = reverse("add_symptom_partial")
+    login_endpoint = reverse("login_view")
 
     # WHEN
     response = anonymous_client.post(endpoint, {})
@@ -67,7 +67,7 @@ def test_add_symptom_deny_anonymous(anonymous_client: Client) -> None:
 @pytest.mark.django_db()
 def test_add_symptom_incorrect_method(authenticated_client: Client) -> None:
     # GIVEN
-    endpoint = reverse("add_symptom")
+    endpoint = reverse("add_symptom_partial")
 
     # WHEN
     response = authenticated_client.get(endpoint)
@@ -79,7 +79,7 @@ def test_add_symptom_incorrect_method(authenticated_client: Client) -> None:
 @pytest.mark.django_db()
 def test_add_symptom_all_missing_from_payload(authenticated_client: Client) -> None:
     # GIVEN
-    endpoint = reverse("add_symptom")
+    endpoint = reverse("add_symptom_partial")
 
     # WHEN
     response = authenticated_client.post(endpoint, {})
@@ -97,7 +97,7 @@ def test_add_symptom_all_missing_from_payload(authenticated_client: Client) -> N
 @pytest.mark.django_db()
 def test_add_symptom_some_missing_from_payload(authenticated_client: Client, user: User) -> None:
     # GIVEN
-    endpoint = reverse("add_symptom")
+    endpoint = reverse("add_symptom_partial")
 
     payload = {
         "date": date.today(),
@@ -167,7 +167,7 @@ def test_add_symptom_incorrect_form_of_payload(
     create_symptom_type: Callable[[], SymptomType],
 ) -> None:
     # GIVEN
-    endpoint = reverse("add_symptom")
+    endpoint = reverse("add_symptom_partial")
     payload = payload_factory(create_symptom_type)
 
     # WHEN
@@ -186,7 +186,7 @@ def test_add_symptom_incorrect_form_of_payload(
 @pytest.mark.django_db()
 def test_add_symptom_does_not_duplicate_symptom_symptom(authenticated_client: Client, user: User) -> None:
     # GIVEN
-    endpoint = reverse("add_symptom")
+    endpoint = reverse("add_symptom_partial")
 
     symptom_type = SymptomTypeFactory.create()
     intensity = 1
@@ -219,7 +219,7 @@ def test_add_symptom_does_not_duplicate_symptom_symptom(authenticated_client: Cl
 @pytest.mark.django_db()
 def test_add_symptom_creates_multiple_allergy_symptoms(authenticated_client: Client, user: User) -> None:
     # GIVEN
-    endpoint = reverse("add_symptom")
+    endpoint = reverse("add_symptom_partial")
 
     symptom_1 = SymptomTypeFactory.create(user=user)
     payload_1 = {
@@ -255,7 +255,7 @@ def test_add_symptom_creates_multiple_allergy_symptoms(authenticated_client: Cli
 @pytest.mark.django_db()
 def test_add_symptom_updates_allergy_symptoms(authenticated_client: Client, user: User) -> None:
     # GIVEN
-    endpoint = reverse("add_symptom")
+    endpoint = reverse("add_symptom_partial")
 
     symptom_type = SymptomTypeFactory.create(user=user)
 
