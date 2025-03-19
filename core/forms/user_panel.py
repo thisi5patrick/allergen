@@ -6,7 +6,7 @@ from django.core.validators import RegexValidator
 from allergy.models import SymptomType
 
 
-class AddNewSymptomForm(forms.ModelForm[SymptomType]):
+class AddNewSymptomForm(forms.ModelForm):  # type: ignore[type-arg]
     name = forms.CharField(
         max_length=255,
         validators=[
@@ -33,7 +33,7 @@ class AddNewSymptomForm(forms.ModelForm[SymptomType]):
         return name
 
     def save(self, commit: bool = True) -> SymptomType:
-        instance = super().save(commit=False)
+        instance: SymptomType = super().save(commit=False)
         instance.user = self.user
         if commit:
             instance.save()
