@@ -1,0 +1,22 @@
+{% for week in calendar %}
+    {% for day in week %}
+        {% if day != 0 %}
+            <div class="text-center">
+                <button
+                   hx-get="{% url 'partial_symptoms_container' year=year month=month day=day %}"
+                   hx-target="#allergy-symptoms"
+                   hx-swap="innerHTML"
+                   class="py-1 block w-full cursor-pointer hover:bg-gray-200 rounded
+                    {% if day == selected_day %}
+                        bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto leading-none
+                    {% endif %}">
+                    {{ day }}
+                </button>
+            </div>
+        {% else %}
+            <div></div>
+        {% endif %}
+    {% endfor %}
+{% endfor %}
+
+<input type="hidden" id="selected-date" name="selected_date" value="{{ selected_date }}">

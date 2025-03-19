@@ -1,0 +1,29 @@
+{% load custom_filters %}
+
+<div id="intensity-{{ symptom_type.uuid }}" class="border-t pt-3">
+  <div class="text-sm font-medium mb-2">{{ symptom_type.name }} intensity:</div>
+  <div class="flex flex-wrap gap-1">
+    {% for i in 1|range_filter:10 %}
+      <button
+        class="w-8 h-8 rounded-full bg-gray-200 text-gray-700 hover:bg-blue-400 text-xs font-medium transition-colors"
+        hx-post="{% url 'partial_symptom_save' %}"
+        hx-swap="outerHTML"
+        hx-target="#intensity-{{ symptom_type.uuid }}"
+        hx-vals='{"symptom_uuid": "{{ symptom_type.uuid }}", "intensity": "{{ i }}"}'
+        hx-include="#selected-date"
+        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+        {{ i }}
+      </button>
+    {% endfor %}
+  </div>
+</div>
+
+<button
+    hx-swap-oob="true"
+    id="symptom-{{ symptom_type.uuid }}"
+    class="symptom-button px-3 py-2 text-sm rounded-lg bg-blue-500 text-white hover:bg-blue-100 transition-colors"
+    hx-delete="{% url 'partial_symptom_remove' symptom_uuid=symptom_type.uuid %}"
+    hx-target="#intensity-{{ symptom_type.uuid }}"
+    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    {{ symptom_type.name }}
+</button>

@@ -1,0 +1,26 @@
+{% load custom_filters %}
+
+<div id="intensity-{{ symptom_type.uuid }}" class="border-t pt-3">
+  <div class="text-sm font-medium mb-2">{{ symptom_type.name }} intensity:</div>
+  <div class="flex flex-wrap gap-1">
+    {% for i in 1|range_filter:10 %}
+      <button
+        class="w-8 h-8 rounded-full {% if entry.intensity == i|add:0 %}bg-blue-500 text-white{% else %}bg-gray-200 text-gray-700{% endif %} hover:bg-blue-400 text-xs font-medium transition-colors"
+        hx-post="{% url 'partial_symptom_save' %}"
+        hx-swap="outerHTML"
+        hx-target="#intensity-{{ symptom_type.uuid }}"
+        hx-vals='{"symptom_uuid": "{{ symptom_type.uuid }}", "intensity": "{{ i }}"}'
+        hx-include="#selected-date"
+        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+        {{ i }}
+      </button>
+    {% endfor %}
+  </div>
+    {% if form.errors %}
+        <div class="text-red-500 text-xs mt-1">
+            {% for error in form.errors %}
+                {{ error }}
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>

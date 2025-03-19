@@ -15,7 +15,7 @@ from tests.factories.user import UserFactory
 @pytest.mark.django_db()
 def test_delete_symptom(authenticated_client: Client, user: User) -> None:
     # GIVEN
-    endpoint = reverse("delete_symptom_partial")
+    endpoint = reverse("partial_symptom_delete")
 
     symptom_type = SymptomTypeFactory.create(user=user)
 
@@ -46,7 +46,7 @@ def test_delete_symptom(authenticated_client: Client, user: User) -> None:
 @pytest.mark.django_db()
 def test_delete_symptom_for_the_exact_day(authenticated_client: Client, user: User) -> None:
     # GIVEN
-    endpoint = reverse("delete_symptom_partial")
+    endpoint = reverse("partial_symptom_delete")
 
     symptom_type = SymptomTypeFactory.create(user=user)
 
@@ -83,7 +83,7 @@ def test_delete_symptom_for_the_exact_day(authenticated_client: Client, user: Us
 @pytest.mark.django_db()
 def test_delete_symptom_deny_anonymous(anonymous_client: Client) -> None:
     # GIVEN
-    endpoint = reverse("delete_symptom_partial")
+    endpoint = reverse("partial_symptom_delete")
     login_endpoint = reverse("login_view")
 
     # WHEN
@@ -97,7 +97,7 @@ def test_delete_symptom_deny_anonymous(anonymous_client: Client) -> None:
 @pytest.mark.django_db()
 def test_delete_symptom_incorrect_method(authenticated_client: Client) -> None:
     # GIVEN
-    endpoint = reverse("delete_symptom_partial")
+    endpoint = reverse("partial_symptom_delete")
 
     # WHEN
     response = authenticated_client.get(endpoint)
@@ -109,7 +109,7 @@ def test_delete_symptom_incorrect_method(authenticated_client: Client) -> None:
 @pytest.mark.django_db()
 def test_delete_symptom_all_missing_from_payload(authenticated_client: Client) -> None:
     # GIVEN
-    endpoint = reverse("delete_symptom_partial")
+    endpoint = reverse("partial_symptom_delete")
 
     # WHEN
     response = authenticated_client.post(endpoint, {})
@@ -126,7 +126,7 @@ def test_delete_symptom_all_missing_from_payload(authenticated_client: Client) -
 @pytest.mark.django_db()
 def test_delete_symptom_some_missing_from_payload(authenticated_client: Client) -> None:
     # GIVEN
-    endpoint = reverse("delete_symptom_partial")
+    endpoint = reverse("partial_symptom_delete")
 
     payload = {
         "date": date.today(),
@@ -147,7 +147,7 @@ def test_delete_symptom_some_missing_from_payload(authenticated_client: Client) 
 @pytest.mark.django_db()
 def test_delete_symptom_cannot_delete_of_other_user(authenticated_client: Client, user: User) -> None:
     # GIVEN
-    endpoint = reverse("delete_symptom_partial")
+    endpoint = reverse("partial_symptom_delete")
     intensity = 1
     today = date.today()
 
