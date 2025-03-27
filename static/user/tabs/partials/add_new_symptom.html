@@ -16,14 +16,10 @@
                    required>
             {% if form.errors %}
                 <div class="text-red-500 text-xs mt-1">
-                    {% for error in form.name.errors %}
-                        {{ error }}
-                    {% endfor %}
+                    {% for error in form.name.errors %}{{ error }}{% endfor %}
                 </div>
             {% elif form %}
-                <div class="text-green-500 text-xs mt-1">
-                    Symptom added successfully.
-                </div>
+                <div class="text-green-500 text-xs mt-1">Symptom added successfully.</div>
             {% else %}
                 <p class="text-xs text-gray-500 mt-1">Only letters and spaces allowed</p>
             {% endif %}

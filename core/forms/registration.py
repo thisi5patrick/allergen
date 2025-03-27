@@ -2,6 +2,8 @@ from typing import Any
 
 from django import forms
 from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 
 
 class RegistrationForm(forms.Form):
@@ -15,8 +17,8 @@ class RegistrationForm(forms.Form):
         if not cleaned_data:
             return {}
 
-        password1 = cleaned_data.get("password")
-        password2 = cleaned_data.get("password2")
+        password1 = cleaned_data["password"]
+        password2 = cleaned_data["password2"]
 
         if password1 and password2 and password1 != password2:
             self.add_error("password", "Passwords do not match.")
@@ -28,5 +30,10 @@ class RegistrationForm(forms.Form):
         email = cleaned_data.get("email")
         if email and User.objects.filter(email=email).exists():
             self.add_error("email", "Email is already registered.")
+
+        try:
+            validate_password(password1)
+        except ValidationError as e:
+            self.add_error("password", e)
 
         return cleaned_data

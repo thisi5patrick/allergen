@@ -1,9 +1,7 @@
 <div class="p-2 bg-red-100 text-red-700 rounded-lg text-sm text-center">
     {% for field in form %}
         {% if field.errors %}
-            {% for error in field.errors %}
-                <p>{{ error }}</p>
-            {% endfor %}
+            {% for error in field.errors %}<p>{{ error }}</p>{% endfor %}
         {% endif %}
     {% endfor %}
 </div>

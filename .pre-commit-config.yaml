@@ -28,6 +28,14 @@ repos:
           - whitenoise
           - pytest-django
           - factory-boy
+  - repo: https://github.com/djlint/djLint
+    rev: v1.36.4
+    hooks:
+      - id: djlint-reformat-django
+        files: static/
+        args: ["--reformat"]
+      - id: djlint-django
+        files: static/
 
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: 0.6.2

@@ -1,11 +1,7 @@
-<button
-    hx-swap-oob="true"
-    id="symptom-{{ symptom_type.uuid }}"
-    class="symptom-button px-3 py-2 text-sm rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
-    hx-get="{% url 'partial_symptom_add' symptom_uuid=symptom_type.uuid %}"
-    hx-target="#intensity-container"
-    hx-swap="afterbegin">
-    {{ symptom_type.name }}
-</button>
-
+<button hx-swap-oob="true"
+        id="symptom-{{ symptom_type.uuid }}"
+        class="symptom-button px-3 py-2 text-sm rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
+        hx-get="{% url 'partial_symptom_add' symptom_uuid=symptom_type.uuid %}"
+        hx-target="#intensity-container"
+        hx-swap="afterbegin">{{ symptom_type.name }}</button>
 <div id="intensity-{{ symptom_type.uuid }}" hx-swap-oob="true"></div>

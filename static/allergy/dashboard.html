@@ -1,43 +1,22 @@
 {% extends "base.html" %}
 {% load static %}
-
 {% block content %}
     <div class="min-h-screen bg-gray-100 flex flex-col">
-        {% include 'navbar.html' %}
-
+        {% include "navbar.html" %}
         <div class="flex flex-col items-center pt-8 pb-8">
             <div class="w-64 bg-white border shadow-lg rounded-xl p-4 mb-8">
                 <div class="flex items-center justify-between mb-4">
                     <div id="calendar-container"
                          hx-get="{% url 'partial_calendar' year=current_year month=current_month day=current_day %}"
                          hx-trigger="load"
-                         hx-swap="innerHTML">
-                    </div>
+                         hx-swap="innerHTML"></div>
                 </div>
             </div>
-
             <div class="w-auto bg-white rounded-lg shadow-md p-4">
                 <div id="allergy-symptoms"
                      hx-get="{% url 'partial_symptoms_container' year=current_year month=current_month day=current_day %}"
                      hx-trigger="load"
-                     hx-swap="innerHTML"
-                >
-{##}
-{#                </div>#}
-{#                <h2 class="text-lg font-medium text-gray-800 mb-3">Allergy Symptoms</h2>#}
-{#                <div class="flex flex-nowrap space-x-2">#}
-{#                    {% for symptom_type in symptom_types %}#}
-{#                        <button class="symptom-button flex items-center bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-2 rounded-full transition duration-200 whitespace-nowrap" data-symptom="{{ symptom_type.uuid }}">#}
-{#                            {{ symptom_type.name }}#}
-{#                        </button>#}
-{#                    {% endfor %}#}
-{#                </div>#}
-{##}
-{#                <div id="intensitySelectors" class="mt-4 space-y-3 hidden"></div>#}
-{##}
-{#                <div id="date-info"></div>#}
-{#                <div id="symptom-form-errors" class="mt-4"></div>#}
-                </div>
+                     hx-swap="innerHTML"></div>
             </div>
         </div>
     </div>
