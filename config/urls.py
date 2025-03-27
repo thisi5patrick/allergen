@@ -22,6 +22,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("core.urls")),
     path("", include("allergy.urls")),
+    path("me/", include("settings.urls")),
 ]
 
-handler404 = "core.views.generic.view_404"
+handler404 = "core.views.view_404"

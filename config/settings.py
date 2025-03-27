@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_htmx",
     "allergy",
+    "settings",
 ]
 
 MIDDLEWARE = [

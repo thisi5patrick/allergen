@@ -9,7 +9,7 @@ from django.views.decorators.http import require_GET, require_POST
 from django_htmx.http import trigger_client_event
 
 from allergy.models import SymptomEntry, SymptomType
-from core.forms.user_panel import AddNewSymptomForm
+from settings.forms.new_symptom import AddNewSymptomForm
 
 
 class ActiveTab(StrEnum):
