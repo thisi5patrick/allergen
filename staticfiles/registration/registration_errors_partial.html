@@ -1,0 +1,17 @@
+{% if form.errors %}
+    {% for field_name, error_list in form.errors.items %}
+        {% if field_name != '__all__' %}
+            <div id="error-{{ field_name }}"
+                 hx-swap-oob="true"
+                 class="text-red-500 text-sm mt-1 pl-3">
+                {% for error in error_list %}<p>{{ error }}</p>{% endfor %}
+            </div>
+        {% else %}
+            <div id="error-non-field"
+                 hx-swap-oob="true"
+                 class="text-red-500 text-sm mt-1 text-center">
+                {% for error in error_list %}<p>{{ error }}</p>{% endfor %}
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}

@@ -1,0 +1,11 @@
+{% if form.errors %}
+    <div id="error-message"
+         hx-swap-oob="true"
+         class="text-red-500 text-sm text-center p-2 mb-4 bg-red-50 rounded-lg">
+        {% if form.non_field_errors %}
+            {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+        {% else %}
+            <p>Incorrect username or password. Please try again.</p>
+        {% endif %}
+    </div>
+{% endif %}
