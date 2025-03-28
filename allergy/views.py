@@ -1,6 +1,5 @@
 import calendar
 from datetime import date
-from http import HTTPStatus
 from typing import cast
 
 from django.contrib.auth.models import User
@@ -8,7 +7,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
-from allergy.forms import AddSymptomForm, DeleteSymptomForm
+from allergy.forms import AddSymptomForm
 from allergy.models import SymptomEntry, SymptomType
 
 
@@ -141,20 +140,3 @@ def partial_symptom_save(request: HttpRequest) -> HttpResponse:
             "entry": entry,
         },
     )
-
-
-@require_POST
-def partial_symptom_delete(request: HttpRequest) -> HttpResponse:
-    form = DeleteSymptomForm(request.POST, user=request.user)
-    if not form.is_valid():
-        return render(
-            request,
-            "allergy/partials/symptom_error.html",
-            {
-                "form": form,
-            },
-        )
-
-    form.delete()
-
-    return HttpResponse(status=HTTPStatus.NO_CONTENT)

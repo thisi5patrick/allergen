@@ -8,12 +8,16 @@ overview_urls = [
 
 symptoms_urls = [
     path("symptoms/", symptoms.symptoms_tab, name="symptoms_tab"),
-    path("symptoms/symptoms_list/", symptoms.symptoms_list_partial, name="symptoms_list_partial"),
-    path("symptoms/add_symptom/", symptoms.add_new_symptom_partial, name="add_new_symptom_partial"),
+    path("symptoms/list/", symptoms.partial_existing_symptoms, name="partial_existing_symptoms"),
     path(
-        "symptoms/add_symptom/process/",
-        symptoms.process_add_new_symptom_partial,
-        name="process_add_new_symptom_partial",
+        "symptoms/new_symptom/save/",
+        symptoms.partial_new_symptom_type_save,
+        name="partial_new_symptom_type_save",
+    ),
+    path(
+        "symptoms/remove/<uuid:symptom_type_uuid>/",
+        symptoms.partial_symptom_remove,
+        name="partial_symptom_type_remove",
     ),
 ]
 

@@ -15,5 +15,4 @@ urlpatterns = [
     path("symptom/add/<uuid:symptom_uuid>/", views.partial_symptom_add, name="partial_symptom_add"),
     path("symptom/remove/<uuid:symptom_uuid>/", views.partial_symptom_remove, name="partial_symptom_remove"),
     path("symptom/save/", views.partial_symptom_save, name="partial_symptom_save"),
-    path("symptom/delete/", views.partial_symptom_delete, name="partial_symptom_delete"),
 ]

@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.db.models import Count
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
-from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from allergy.models import SymptomType
 from settings.forms.new_symptom import AddNewSymptomForm
@@ -20,12 +20,12 @@ def symptoms_tab(request: HttpRequest) -> HttpResponse:
 
 
 @require_GET
-def symptoms_list_partial(request: HttpRequest) -> HttpResponse:
+def partial_existing_symptoms(request: HttpRequest) -> HttpResponse:
     user = cast(User, request.user)
     symptom_types = (
         SymptomType.objects.filter(user=user)
         .select_related("symptom_entries")
-        .values("name")
+        .values("uuid", "name")
         .annotate(entries_count=Count("symptom_entries"))
         .order_by("name")
         .all()
@@ -33,31 +33,35 @@ def symptoms_list_partial(request: HttpRequest) -> HttpResponse:
 
     return render(
         request,
-        "settings/tabs/partials/symptoms_list.html",
+        "settings/tabs/partials/symptoms/existing_symptoms.html",
         {
             "symptom_types": symptom_types,
         },
     )
 
 
-@require_GET
-def add_new_symptom_partial(request: HttpRequest) -> HttpResponse:
-    return render(
-        request,
-        "settings/tabs/partials/add_new_symptom.html",
-        {},
-    )
-
-
 @require_POST
-def process_add_new_symptom_partial(request: HttpRequest) -> HttpResponse:
+def partial_new_symptom_type_save(request: HttpRequest) -> HttpResponse:
     form = AddNewSymptomForm(request.POST, user=request.user)
+    symptom_type = None
     if form.is_valid():
-        form.save()
+        symptom_type = form.save()
     return render(
         request,
-        "settings/tabs/partials/add_new_symptom.html",
+        "settings/tabs/partials/symptoms/add_symptom_type.html",
         {
             "form": form,
+            "symptom_type": symptom_type,
         },
     )
+
+
+@require_http_methods(["DELETE"])
+def partial_symptom_remove(request: HttpRequest, symptom_type_uuid: str) -> HttpResponse:
+    user = cast(User, request.user)
+
+    symptom = SymptomType.objects.filter(uuid=symptom_type_uuid, user=user).first()
+    if symptom:
+        symptom.delete()
+
+    return HttpResponse(status=200)

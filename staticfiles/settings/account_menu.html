@@ -11,7 +11,7 @@
             <option value="{% url 'food_allergies_tab' %}"
                     {% if active_tab == 'food_allergies' %}selected{% endif %}>Food Allergies</option>
             <option value="{% url 'medications_tab' %}"
-                    {% if active_tab == 'medications' %}selected{% endif %}>Drugs</option>
+                    {% if active_tab == 'medications' %}selected{% endif %}>Medications</option>
             <option value="{% url 'change_password_tab' %}"
                     {% if active_tab == 'change_password' %}selected{% endif %}>Change Password</option>
             <option value="{% url 'delete_account_tab' %}"
@@ -37,7 +37,7 @@
         <a href="{% url 'medications_tab' %}"
            class="flex items-center p-3 rounded-lg text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition duration-200 {% if active_tab == 'medications' %}bg-purple-100 text-purple-700 font-medium{% endif %}">
             <i class="fas fa-pills mr-3 text-purple-500"></i>
-            <span>Drugs</span>
+            <span>Medications</span>
         </a>
         <div class="border-t border-gray-200 my-3"></div>
         <a href="{% url 'change_password_tab' %}"
