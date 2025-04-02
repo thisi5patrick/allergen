@@ -23,7 +23,8 @@ def login_view(request: HttpRequest) -> HttpResponse:
     if request.user.is_authenticated:
         return redirect("dashboard")
 
-    return render(request, "login/login.html")
+    form = LoginForm()
+    return render(request, "login/login.html", {"form": form})
 
 
 @require_POST
@@ -42,7 +43,7 @@ def login_process(request: HttpRequest) -> HttpResponse:
         login(request, user)
         return HttpResponseClientRedirect("/dashboard/")
 
-    return render(request, "login/login_errors_partial.html", {"form": form})
+    return render(request, "login/login_form_partial.html", {"form": form})
 
 
 @require_GET
