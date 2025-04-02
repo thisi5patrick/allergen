@@ -12,11 +12,13 @@
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="stylesheet"
               href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        {{ form.media.css }}
     </head>
     <body class="bg-gray-100 h-screen flex items-center justify-center">
         <div class="flex flex-col h-full w-full mb-8 pb-8">
             {% block content %}
             {% endblock content %}
         </div>
+        {{ form.media }}
     </body>
 </html>

@@ -8,6 +8,7 @@ dependencies = [
     "django>=5.1.6",
     "django-environ>=0.12.0",
     "django-htmx>=1.22.0",
+    "django-recaptcha>=4.1.0",
     "psycopg[binary,pool]>=3.2.5",
     "whitenoise>=6.9.0",
 ]
@@ -43,6 +44,11 @@ plugins = ["mypy_django_plugin.main"]
 
 [[tool.mypy.overrides]]
 module = "environ"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "django_recaptcha.*"
+follow_imports = "skip"
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]

@@ -10,6 +10,7 @@ dependencies = [
     { name = "django" },
     { name = "django-environ" },
     { name = "django-htmx" },
+    { name = "django-recaptcha" },
     { name = "psycopg", extra = ["binary", "pool"] },
     { name = "whitenoise" },
 ]
@@ -29,6 +30,7 @@ requires-dist = [
     { name = "django", specifier = ">=5.1.6" },
     { name = "django-environ", specifier = ">=0.12.0" },
     { name = "django-htmx", specifier = ">=1.22.0" },
+    { name = "django-recaptcha", specifier = ">=4.1.0" },
     { name = "psycopg", extras = ["binary", "pool"], specifier = ">=3.2.5" },
     { name = "whitenoise", specifier = ">=6.9.0" },
 ]
@@ -121,6 +123,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/e2/59/bac8c1873a676ea661babd5d8bc1a04cfcfe1176b0bf526bcd058e6ec05a/django_htmx-1.22.0.tar.gz", hash = "sha256:7306e1aba4e407496f30a57ec2e0b2974a9b96c8c6036f7ec6a8b5753ea0abdd", size = 9621 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/62/6d/c99d5d5a9edb759ebd295ec96479254b6cc7b80f40d1ee66ebb7d677fc0d/django_htmx-1.22.0-py3-none-any.whl", hash = "sha256:9f1fcf239125a42d6dadc814b3796b8d6faad8ded444a14ae021d0241fa9a40f", size = 6904 },
+]
+
+[[package]]
+name = "django-recaptcha"
+version = "4.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/bd/a2/480cd2df8031c30afe0d67b0a5e6299ced20f2e65135a3c160c4031d7052/django_recaptcha-4.1.0.tar.gz", hash = "sha256:73097b958733f65b729d4e4630c51fc2bf147aca6f026017d18898dfc25cb4c5", size = 28676 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8b/e7/0765f98e4953e26573512284995648c439b0eb252877b655683d28c90be2/django_recaptcha-4.1.0-py3-none-any.whl", hash = "sha256:463aa65967e973de466b28ce8e8b6abb2faffb1ce0c7faa1bf0e5b041e0497cb", size = 39473 },
 ]
 
 [[package]]

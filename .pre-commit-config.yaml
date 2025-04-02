@@ -20,7 +20,6 @@ repos:
         args: [ --config-file, pyproject.toml ]
         types: [ python ]
         additional_dependencies:
-          - python-dotenv
           - django-stubs
           - django-htmx
           - psycopg
@@ -28,6 +27,8 @@ repos:
           - whitenoise
           - pytest-django
           - factory-boy
+          - django-recaptcha
+
   - repo: https://github.com/djlint/djLint
     rev: v1.36.4
     hooks:

@@ -21,6 +21,8 @@ env = environ.Env(
     ALLOWED_HOSTS=(list, ["localhost"]),
     DATABASE_URL=(str, "postgresql://postgres:postgres@localhost:5432/postgres"),
     CSRF_TRUSTED_ORIGINS=(list, []),
+    RECAPTCHA_PUBLIC_KEY=(str, ""),
+    RECAPTCHA_PRIVATE_KEY=(str, ""),
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -51,6 +53,7 @@ INSTALLED_APPS = [
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
     "django_htmx",
+    "django_recaptcha",
     "allergy",
     "settings",
 ]
@@ -146,3 +149,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_URL = reverse_lazy("login_view")
 LOGIN_REDIRECT_URL = "dashboard"
 APPEND_SLASH = True
+
+RECAPTCHA_PUBLIC_KEY = env("RECAPTCHA_PUBLIC_KEY")
+RECAPTCHA_PRIVATE_KEY = env("RECAPTCHA_PRIVATE_KEY")

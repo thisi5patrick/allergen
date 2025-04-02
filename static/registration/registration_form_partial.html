@@ -1,0 +1,73 @@
+<form method="post"
+      id="registration-form"
+      hx-post="{% url 'registration_process' %}"
+      hx-swap="outerHTML"
+      class="space-y-6">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+        <div id="error-non-field"
+             class="text-red-500 text-sm text-center mb-4 p-2 bg-red-100 rounded">
+            {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+        </div>
+    {% endif %}
+    <div class="mb-1">
+        <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <i class="fas fa-user text-gray-400"></i>
+            </span>
+            {{ form.username }}
+        </div>
+        {% if form.username.errors %}<div class="text-red-500 text-sm mt-1 pl-3">{{ form.username.errors }}</div>{% endif %}
+    </div>
+    <div class="mb-1">
+        <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <i class="fas fa-envelope text-gray-400"></i>
+            </span>
+            {{ form.email }}
+        </div>
+        {% if form.email.errors %}<div class="text-red-500 text-sm mt-1 pl-3">{{ form.email.errors }}</div>{% endif %}
+    </div>
+    <div class="mb-1">
+        <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <i class="fas fa-lock text-gray-400"></i>
+            </span>
+            {{ form.password }}
+        </div>
+        {% if form.password.errors %}<div class="text-red-500 text-sm mt-1 pl-3">{{ form.password.errors }}</div>{% endif %}
+    </div>
+    <div class="mb-1">
+        <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <i class="fas fa-lock text-gray-400"></i>
+            </span>
+            {{ form.password2 }}
+        </div>
+        {% if form.password2.errors %}<div class="text-red-500 text-sm mt-1 pl-3">{{ form.password2.errors }}</div>{% endif %}
+    </div>
+    <div class="mb-1">
+        {{ form.captcha }}
+        {% if form.captcha.errors %}<div class="text-red-500 text-sm mt-1 pl-3">{{ form.captcha.errors }}</div>{% endif %}
+    </div>
+    <div id="error-non-field" class="text-red-500 text-sm text-center"></div>
+    <div class="mt-6">
+        <button type="submit"
+                id="submit-button"
+                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-150"
+                hx-indicator="#spinner">
+            <span id="spinner" class="htmx-indicator mr-2">
+                <i class="fas fa-circle-notch fa-spin"></i>
+            </span>
+            Create Account
+        </button>
+    </div>
+</form>
+<script>
+  function triggerHtmxSubmit(token) {
+    var theForm = document.getElementById('registration-form');
+    if (theForm) {
+        htmx.trigger(theForm, 'submit');
+    }
+  }
+</script>

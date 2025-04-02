@@ -50,7 +50,9 @@ def login_process(request: HttpRequest) -> HttpResponse:
 def registration_view(request: HttpRequest) -> HttpResponse:
     if request.user.is_authenticated:
         return redirect("dashboard")
-    return render(request, "registration/registration.html")
+
+    form = RegistrationForm()
+    return render(request, "registration/registration.html", {"form": form})
 
 
 @require_POST
@@ -78,7 +80,7 @@ def registration_process(request: HttpRequest) -> HttpResponse:
         login(request, user)
         return HttpResponseClientRedirect("/dashboard/")
 
-    return render(request, "registration/registration_errors_partial.html", {"form": form})
+    return render(request, "registration/registration_form_partial.html", {"form": form})
 
 
 @require_POST
