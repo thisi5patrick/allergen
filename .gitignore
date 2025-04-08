@@ -24,4 +24,4 @@ media/
 *.swo
 
 .DS_Store
-
+.coverage
