@@ -10,6 +10,7 @@ from django.db.models import (
     ForeignKey,
     IntegerField,
     Model,
+    TextChoices,
     UUIDField,
 )
 
@@ -46,3 +47,36 @@ class SymptomEntry(TimestampedModelMixin):
 
     def __str__(self) -> str:
         return f"{self.user} - {self.entry_date} - {self.symptom_type.name} ({self.intensity})"
+
+
+class Medications(TimestampedModelMixin):
+    class MedicationType(TextChoices):
+        PILLS = "pills", "Pills"
+        INJECTION = "injection", "Injection"
+        EYE_DROPS = "eye_drops", "Eye Drops"
+        NOSE_DROPS = "nose_drops", "Nose Drops"
+
+    uuid = UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = ForeignKey(User, on_delete=CASCADE)
+    medication_name = CharField(max_length=255, blank=False)
+    medication_type = CharField(max_length=255, choices=MedicationType.choices)
+
+    class Meta:
+        unique_together = ("user", "medication_name", "medication_type")
+
+    def __str__(self) -> str:
+        return f"{self.user} - {self.medication_name} - {self.medication_type}"
+
+    @staticmethod
+    def get_medication_icon_for_type(medication_type_value: str) -> str:
+        icons: dict[str, str] = {
+            Medications.MedicationType.PILLS: '<i class="fas fa-capsules text-blue-500 mr-2"></i>',
+            Medications.MedicationType.INJECTION: '<i class="fas fa-syringe text-red-500 mr-2"></i>',
+            Medications.MedicationType.EYE_DROPS: '<i class="fas fa-eye-dropper text-green-500 mr-2"></i>',
+            Medications.MedicationType.NOSE_DROPS: '<i class="fas fa-tint text-yellow-500 mr-2"></i>',
+        }
+        return icons.get(medication_type_value, '<i class="fas fa-question-circle text-gray-500 mr-2"></i>')
+
+    @property
+    def icon_html(self) -> str:
+        return self.get_medication_icon_for_type(self.medication_type)

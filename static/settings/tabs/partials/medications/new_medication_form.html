@@ -1,0 +1,43 @@
+<form hx-post="{% url 'add_medication' %}"
+      hx-target="this"
+      hx-swap="outerHTML">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
+             role="alert">
+            <strong class="font-bold">Error!</strong>
+            <span class="block sm:inline">
+                {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+            </span>
+        </div>
+    {% endif %}
+    <div class="flex space-x-4 mb-1">
+        <div class="flex-grow">
+            <label for="{{ form.medication_name.id_for_label }}"
+                   class="block text-sm font-medium text-gray-700">{{ form.medication_name.label }}</label>
+        </div>
+        <div class="w-1/3">
+            <label for="{{ form.medication_type.id_for_label }}"
+                   class="block text-sm font-medium text-gray-700">{{ form.medication_type.label }}</label>
+        </div>
+    </div>
+    <div class="flex items-start space-x-4 mb-4">
+        <div class="flex-grow">
+            {{ form.medication_name }}
+            <div class="text-xs mt-1 h-5 {% if form.medication_name.errors %}text-red-500{% else %}invisible{% endif %}">
+                {% if form.medication_name.errors %}
+                    {% for error in form.medication_name.errors %}{{ error }}{% endfor %}
+                {% else %}
+ 
+                {% endif %}
+            </div>
+        </div>
+        <div class="w-1/3">{{ form.medication_type }}</div>
+    </div>
+    <div class="flex justify-end">
+        <button type="submit"
+                class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+            Add Medication
+        </button>
+    </div>
+</form>

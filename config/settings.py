@@ -12,8 +12,11 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 
+import django_stubs_ext
 import environ
 from django.urls import reverse_lazy
+
+django_stubs_ext.monkeypatch()
 
 env = environ.Env(
     DEBUG=(bool, False),

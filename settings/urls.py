@@ -27,6 +27,8 @@ food_allergy_urls = [
 
 medications_urls = [
     path("medications/", medications.medications_tab, name="medications_tab"),
+    path("medications/save/", medications.add_medication, name="add_medication"),
+    path("medications/<uuid:medication_uuid>/", medications.delete_medication, name="delete_medication"),
 ]
 
 account_urls = [
