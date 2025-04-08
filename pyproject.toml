@@ -22,6 +22,7 @@ dev = [
     "factory-boy>=3.3.3",
     "mypy>=1.15.0",
     "pytest-django>=4.10.0",
+    "pytest-env>=1.1.5",
     "ruff>=0.9.7",
 ]
 
@@ -91,6 +92,10 @@ ignore = [
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings"
+env = [
+    "RECAPTCHA_PUBLIC_KEY=6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI",
+    "RECAPTCHA_PRIVATE_KEY=6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe"
+]
 
 [tool.django-stubs]
 django_settings_module = "config.settings"

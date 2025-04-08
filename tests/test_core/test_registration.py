@@ -1,13 +1,43 @@
 from http import HTTPStatus
-from typing import cast
 
 import pytest
 from django.contrib.auth.models import User
-from django.template import RequestContext
 from django.test import Client
 from django.urls import reverse
+from pytest_django.asserts import assertRedirects, assertTemplateUsed
 
 from allergy.models import SymptomType
+from core.forms.registration import RegistrationForm
+
+
+@pytest.mark.django_db()
+def test_registration_view_with_anonymous_user(anonymous_client: Client) -> None:
+    # Given
+    endpoint = reverse("registration_view")
+
+    # When
+    response = anonymous_client.get(endpoint)
+
+    # Then
+    assert response.status_code == 200
+
+    assertTemplateUsed(response, "registration/registration.html")
+
+    assert "form" in response.context
+    assert isinstance(response.context["form"], RegistrationForm)
+
+
+@pytest.mark.django_db()
+def test_registration_view_with_logged_in_user(authenticated_client: Client) -> None:
+    # Given
+    endpoint = reverse("registration_view")
+
+    # When
+    response = authenticated_client.get(endpoint)
+
+    # Then
+    expected_redirect = reverse("dashboard")
+    assertRedirects(response, expected_redirect)
 
 
 @pytest.mark.django_db()
@@ -17,15 +47,18 @@ def test_registration_process(anonymous_client: Client) -> None:
     payload = {
         "username": "name",
         "email": "email@email.com",
-        "password": "password",
-        "password2": "password",
+        "password": "some-password-12345",
+        "password2": "some-password-12345",
+        "g-recaptcha-response": "PASSED",
     }
 
     # WHEN
     response = anonymous_client.post(endpoint, payload)
 
     # THEN
-    assert response.status_code == HTTPStatus.OK
+    expected_redirect = reverse("dashboard")
+
+    assertRedirects(response, expected_redirect)
 
     assert User.objects.count() == 1
 
@@ -54,8 +87,7 @@ def test_registration_process_missing_payload(anonymous_client: Client) -> None:
     # THEN
     assert response.status_code == HTTPStatus.OK
 
-    context = cast(RequestContext, response.context)
-    assert context.template_name == "registration/registration_error_message.html"
+    assertTemplateUsed(response, "registration/registration_form_partial.html")
 
     form = response.context["form"]
     assert "This field is required." in form.errors["username"]
@@ -109,8 +141,7 @@ def test_registration_process_incorrect_payload(
     # THEN
     assert response.status_code == HTTPStatus.OK
 
-    context = cast(RequestContext, response.context)
-    assert context.template_name == "registration/registration_error_message.html"
+    assertTemplateUsed(response, "registration/registration_form_partial.html")
 
     form = response.context["form"]
     assert error_message in form.errors[field]

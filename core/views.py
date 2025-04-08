@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_not_required
 from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_GET, require_POST
 from django_htmx.http import HttpResponseClientRedirect
 
@@ -50,7 +51,8 @@ def login_process(request: HttpRequest) -> HttpResponse:
 @login_not_required
 def registration_view(request: HttpRequest) -> HttpResponse:
     if request.user.is_authenticated:
-        return redirect("dashboard")
+        url = reverse("dashboard")
+        return redirect(url)
 
     form = RegistrationForm()
     return render(request, "registration/registration.html", {"form": form})
@@ -79,7 +81,9 @@ def registration_process(request: HttpRequest) -> HttpResponse:
         )
 
         login(request, user)
-        return HttpResponseClientRedirect("/dashboard/")
+
+        url = reverse("dashboard")
+        return redirect(url)
 
     return render(request, "registration/registration_form_partial.html", {"form": form})
 
