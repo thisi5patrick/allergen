@@ -9,14 +9,16 @@ from pytest_django.asserts import assertRedirects, assertTemplateUsed
 from allergy.models import SymptomType
 from core.forms.registration import RegistrationForm
 
+REGISTRATION_VIEW = reverse("registration_view")
+REGISTRATION_PROCESS = reverse("registration_process")
+
 
 @pytest.mark.django_db()
 def test_registration_view_with_anonymous_user(anonymous_client: Client) -> None:
     # Given
-    endpoint = reverse("registration_view")
 
     # When
-    response = anonymous_client.get(endpoint)
+    response = anonymous_client.get(REGISTRATION_VIEW)
 
     # Then
     assert response.status_code == 200
@@ -28,22 +30,31 @@ def test_registration_view_with_anonymous_user(anonymous_client: Client) -> None
 
 
 @pytest.mark.django_db()
-def test_registration_view_with_logged_in_user(authenticated_client: Client) -> None:
+def test_registration_view_with_authenticated_user(authenticated_client: Client) -> None:
     # Given
-    endpoint = reverse("registration_view")
+    expected_redirect = reverse("dashboard")
 
     # When
-    response = authenticated_client.get(endpoint)
+    response = authenticated_client.get(REGISTRATION_VIEW)
 
     # Then
-    expected_redirect = reverse("dashboard")
     assertRedirects(response, expected_redirect)
 
 
 @pytest.mark.django_db()
+def test_registration_view_with_incorrect_rest_method(anonymous_client: Client) -> None:
+    # Given
+
+    # WHen
+    response = anonymous_client.post(REGISTRATION_VIEW, {})
+
+    # Then
+    assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED
+
+
+@pytest.mark.django_db()
 def test_registration_process(anonymous_client: Client) -> None:
-    # GIVEN
-    endpoint = reverse("registration_process")
+    # Given
     payload = {
         "username": "name",
         "email": "email@email.com",
@@ -52,10 +63,10 @@ def test_registration_process(anonymous_client: Client) -> None:
         "g-recaptcha-response": "PASSED",
     }
 
-    # WHEN
-    response = anonymous_client.post(endpoint, payload)
+    # When
+    response = anonymous_client.post(REGISTRATION_PROCESS, payload)
 
-    # THEN
+    # Then
     expected_redirect = reverse("dashboard")
 
     assertRedirects(response, expected_redirect)
@@ -72,19 +83,29 @@ def test_registration_process(anonymous_client: Client) -> None:
 
 
 @pytest.mark.django_db()
-def test_registration_process_missing_payload(anonymous_client: Client) -> None:
-    # GIVEN
-    endpoint = reverse("registration_process")
+def test_registration_process_with_incorrect_rest_method(anonymous_client: Client) -> None:
+    # Given
+
+    # WHen
+    response = anonymous_client.get(REGISTRATION_PROCESS)
+
+    # Then
+    assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED
+
+
+@pytest.mark.django_db()
+def test_registration_process_with_missing_payload(anonymous_client: Client) -> None:
+    # Given
     payload = {
         "email": "email@email.com",
         "password": "password",
         "password2": "password",
     }
 
-    # WHEN
-    response = anonymous_client.post(endpoint, payload)
+    # When
+    response = anonymous_client.post(REGISTRATION_PROCESS, payload)
 
-    # THEN
+    # Then
     assert response.status_code == HTTPStatus.OK
 
     assertTemplateUsed(response, "registration/registration_form_partial.html")
@@ -132,13 +153,12 @@ def test_registration_process_missing_payload(anonymous_client: Client) -> None:
 def test_registration_process_incorrect_payload(
     payload: dict[str, str], field: str, error_message: str, anonymous_client: Client
 ) -> None:
-    # GIVEN
-    endpoint = reverse("registration_process")
+    # Given
 
-    # WHEN
-    response = anonymous_client.post(endpoint, payload)
+    # When
+    response = anonymous_client.post(REGISTRATION_PROCESS, payload)
 
-    # THEN
+    # Then
     assert response.status_code == HTTPStatus.OK
 
     assertTemplateUsed(response, "registration/registration_form_partial.html")
