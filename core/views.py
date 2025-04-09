@@ -41,7 +41,7 @@ def login_process(request: HttpRequest) -> HttpResponse:
         if form.cleaned_data.get("remember_me"):
             request.session.set_expiry(60 * 60 * 24 * 7)
         else:
-            request.session.set_expiry(0)
+            request.session.set_expiry(None)
 
         login(request, user)
         dashboard_redirect = reverse("dashboard")

@@ -165,3 +165,55 @@ def test_registration_process_incorrect_payload(
 
     form = response.context["form"]
     assert error_message in form.errors[field]
+
+
+@pytest.mark.django_db()
+def test_registration_process_with_already_existing_email(anonymous_client: Client) -> None:
+    # Given
+    existing_email = "some-email@email.com"
+    User.objects.create_user(username="some-username", email=existing_email, password="some-password")
+
+    payload = {
+        "username": "name",
+        "email": existing_email,
+        "password": "some-password-12345",
+        "password2": "some-password-12345",
+        "g-recaptcha-response": "PASSED",
+    }
+
+    # When
+    response = anonymous_client.post(REGISTRATION_PROCESS, payload)
+
+    # Then
+    assert response.status_code == HTTPStatus.OK
+
+    assertTemplateUsed(response, "registration/registration_form_partial.html")
+
+    form = response.context["form"]
+    assert "Email is already registered." in form.errors["email"]
+
+
+@pytest.mark.django_db()
+def test_registration_process_with_already_existing_username(anonymous_client: Client) -> None:
+    # Given
+    existing_username = "some-email@email.com"
+    User.objects.create_user(username=existing_username, password="some-password")
+
+    payload = {
+        "username": existing_username,
+        "email": "email@email.com",
+        "password": "some-password-12345",
+        "password2": "some-password-12345",
+        "g-recaptcha-response": "PASSED",
+    }
+
+    # When
+    response = anonymous_client.post(REGISTRATION_PROCESS, payload)
+
+    # Then
+    assert response.status_code == HTTPStatus.OK
+
+    assertTemplateUsed(response, "registration/registration_form_partial.html")
+
+    form = response.context["form"]
+    assert "Username already exists." in form.errors["username"]
