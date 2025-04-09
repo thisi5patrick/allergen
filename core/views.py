@@ -5,7 +5,6 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_GET, require_POST
-from django_htmx.http import HttpResponseClientRedirect
 
 from allergy.models import SymptomType
 from core.forms.login import LoginForm
@@ -14,15 +13,18 @@ from core.forms.registration import RegistrationForm
 
 def view_404(request: HttpRequest, exception: None | Exception = None) -> HttpResponse:
     if request.user.is_authenticated:
-        return redirect("dashboard")
-    return redirect("login_view")
+        dashboard_redirect = reverse("dashboard")
+        return redirect(dashboard_redirect)
+    login_redirect = reverse("login_view")
+    return redirect(login_redirect)
 
 
 @require_GET
 @login_not_required
 def login_view(request: HttpRequest) -> HttpResponse:
     if request.user.is_authenticated:
-        return redirect("dashboard")
+        dashboard_redirect = reverse("dashboard")
+        return redirect(dashboard_redirect)
 
     form = LoginForm()
     return render(request, "login/login.html", {"form": form})
@@ -42,7 +44,8 @@ def login_process(request: HttpRequest) -> HttpResponse:
             request.session.set_expiry(0)
 
         login(request, user)
-        return HttpResponseClientRedirect("/dashboard/")
+        dashboard_redirect = reverse("dashboard")
+        return redirect(dashboard_redirect)
 
     return render(request, "login/login_form_partial.html", {"form": form})
 
@@ -51,8 +54,8 @@ def login_process(request: HttpRequest) -> HttpResponse:
 @login_not_required
 def registration_view(request: HttpRequest) -> HttpResponse:
     if request.user.is_authenticated:
-        url = reverse("dashboard")
-        return redirect(url)
+        dashboard_redirect = reverse("dashboard")
+        return redirect(dashboard_redirect)
 
     form = RegistrationForm()
     return render(request, "registration/registration.html", {"form": form})
@@ -82,8 +85,8 @@ def registration_process(request: HttpRequest) -> HttpResponse:
 
         login(request, user)
 
-        url = reverse("dashboard")
-        return redirect(url)
+        dashboard_redirect = reverse("dashboard")
+        return redirect(dashboard_redirect)
 
     return render(request, "registration/registration_form_partial.html", {"form": form})
 
@@ -92,4 +95,5 @@ def registration_process(request: HttpRequest) -> HttpResponse:
 def logout_process(request: HttpRequest) -> HttpResponse:
     if request.user.is_authenticated:
         logout(request)
-    return HttpResponseClientRedirect("/login/")
+    login_redirect = reverse("login_view")
+    return redirect(login_redirect)
