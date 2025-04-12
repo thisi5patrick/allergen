@@ -1,4 +1,4 @@
-[![CI Status](https://github.com/thisi5patrick/allergen/actions/workflows/ci.yml)](https://github.com/thisi5patrick/allergen/actions/workflows/ci.yml)
+[![CI Status](https://github.com/thisi5patrick/allergen/actions/workflows/ci.yaml/badge.svg)](https://github.com/thisi5patrick/allergen/actions/workflows/ci.yaml)
 [![codecov](https://codecov.io/gh/thisi5patrick/allergen/graph/badge.svg?token=N0TJKV66JJ)](https://codecov.io/gh/thisi5patrick/allergen)
 
 # Allergies Tracker
