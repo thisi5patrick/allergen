@@ -1,8 +1,0 @@
-<button hx-swap-oob="true"
-        id="symptom-{{ symptom_type.uuid }}"
-        class="symptom-button px-3 py-2 text-sm rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
-        hx-get="{% url 'allergy:symptom_add_partial' symptom_uuid=symptom_type.uuid %}"
-        hx-target="#intensity-container"
-        hx-swap="afterbegin"
-        hx-include="#selected-date">{{ symptom_type.name }}</button>
-<div id="intensity-{{ symptom_type.uuid }}" hx-swap-oob="true"></div>

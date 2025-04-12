@@ -15,7 +15,7 @@ LOGIN_URL_NAME = "login_view"
 DASHBOARD_URL_NAME = "allergy:dashboard"
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_symptom_add_anonymous(anonymous_client: Client, user: User) -> None:
     # Given
     symptom_type = SymptomTypeFactory.create(user=user)
@@ -33,7 +33,7 @@ def test_symptom_add_anonymous(anonymous_client: Client, user: User) -> None:
     assertRedirects(response, expected_redirect_url)
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_symptom_add_authenticated_valid(authenticated_client: Client, user: User) -> None:
     # Given
     symptom_type = SymptomTypeFactory.create(user=user)
@@ -58,7 +58,7 @@ def test_symptom_add_authenticated_valid(authenticated_client: Client, user: Use
     assertContains(response, "hx-delete=")
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_symptom_add_authenticated_not_found_returns_400(authenticated_client: Client) -> None:
     # Given
     invalid_uuid = uuid.uuid4()
@@ -74,7 +74,7 @@ def test_symptom_add_authenticated_not_found_returns_400(authenticated_client: C
     assert b"Invalid or unknown symptom specified." in response.content
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_symptom_add_authenticated_wrong_user_returns_400(authenticated_second_user_client: Client, user: User) -> None:
     # Given
     symptom_type_other_user = SymptomTypeFactory.create(user=user)
@@ -90,7 +90,7 @@ def test_symptom_add_authenticated_wrong_user_returns_400(authenticated_second_u
     assert b"Invalid or unknown symptom specified." in response.content
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_symptom_add_missing_date_param_fails_template_render(authenticated_client: Client, user: User) -> None:
     # Given
     symptom_type = SymptomTypeFactory.create(user=user)
@@ -105,7 +105,7 @@ def test_symptom_add_missing_date_param_fails_template_render(authenticated_clie
     assert "keyword arguments '{'year': '', 'month': '', 'day':" in str(excinfo.value)
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_symptom_add_invalid_date_param_fails_template_render(authenticated_client: Client, user: User) -> None:
     # Given
     symptom_type = SymptomTypeFactory.create(user=user)
@@ -121,7 +121,7 @@ def test_symptom_add_invalid_date_param_fails_template_render(authenticated_clie
     assert "keyword arguments '{'year': '', 'month': '', 'day':" in str(excinfo.value)
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_symptom_add_post_not_allowed(authenticated_client: Client, user: User) -> None:
     # Given
     symptom_type = SymptomTypeFactory.create(user=user)

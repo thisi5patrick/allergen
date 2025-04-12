@@ -18,7 +18,7 @@ def calendar_url(year: int, month: int, day: int | None = None) -> str:
     return reverse(PARTIAL_CALENDAR_VIEW_NAME, kwargs=kwargs)
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_dashboard_view_with_anonymous_user(anonymous_client: Client) -> None:
     # Given
     dashboard_url = reverse(DASHBOARD_VIEW_NAME)
@@ -32,7 +32,7 @@ def test_dashboard_view_with_anonymous_user(anonymous_client: Client) -> None:
     assertRedirects(response, expected_redirect)
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_dashboard_view_with_authenticated_user(authenticated_client: Client) -> None:
     # Given
     dashboard_url = reverse(DASHBOARD_VIEW_NAME)
@@ -60,7 +60,7 @@ def test_dashboard_view_with_authenticated_user(authenticated_client: Client) ->
     assertContains(response, 'id="allergy-symptoms"')
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_dashboard_view_post_not_allowed(authenticated_client: Client) -> None:
     # Given
     dashboard_url = reverse(DASHBOARD_VIEW_NAME)

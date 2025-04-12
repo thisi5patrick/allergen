@@ -4,7 +4,7 @@ default_language_version:
 
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.14
+    rev: v0.11.5
     hooks:
       # linter
       - id: ruff
@@ -40,6 +40,6 @@ repos:
         files: static/
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.6.2
+    rev: 0.6.14
     hooks:
       - id: uv-lock

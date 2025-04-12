@@ -11,7 +11,7 @@ TEST_USERNAME_2 = "testuser_2"
 TEST_PASSWORD_2 = "testpassword_2"
 
 
-@pytest.fixture()
+@pytest.fixture
 def user() -> User:
     user = UserFactory.create(username=TEST_USERNAME_1)
     user.set_password(TEST_PASSWORD_1)
@@ -20,7 +20,7 @@ def user() -> User:
     return user
 
 
-@pytest.fixture()
+@pytest.fixture
 def second_user() -> User:
     user = UserFactory.create(username=TEST_USERNAME_2)
     user.set_password(TEST_PASSWORD_2)
@@ -29,7 +29,7 @@ def second_user() -> User:
     return user
 
 
-@pytest.fixture()
+@pytest.fixture
 def authenticated_client(user: User) -> Client:
     client = Client()
     client.login(username=TEST_USERNAME_1, password=TEST_PASSWORD_1)
@@ -37,7 +37,7 @@ def authenticated_client(user: User) -> Client:
     return client
 
 
-@pytest.fixture()
+@pytest.fixture
 def authenticated_second_user_client(second_user: User) -> Client:
     client = Client()
     client.login(username=TEST_USERNAME_2, password=TEST_PASSWORD_2)
@@ -45,6 +45,6 @@ def authenticated_second_user_client(second_user: User) -> Client:
     return client
 
 
-@pytest.fixture()
+@pytest.fixture
 def anonymous_client() -> Client:
     return Client()

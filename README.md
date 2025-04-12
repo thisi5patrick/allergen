@@ -80,7 +80,7 @@ source .venv/bin/activate # Or .venv\Scripts\activate on Windows
 
 6. Install Dependencies: Install project and development dependencies
 ```shell
-uv sync -g dev
+uv sync --dev
 ```
 
 7. Setup Database: Ensure PostgreSQL >= 16 is installed, running, and configured according to your .env file (create the user and database if needed).

@@ -4,7 +4,7 @@ from django.urls import reverse
 from pytest_django.asserts import assertRedirects
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_logout_redirect_with_anonymous_user(anonymous_client: Client) -> None:
     # Given
     url = reverse("logout_process")
@@ -17,7 +17,7 @@ def test_logout_redirect_with_anonymous_user(anonymous_client: Client) -> None:
     assertRedirects(response, expected_redirect_url)
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_logout_redirect_with_authenticated_user(authenticated_client: Client) -> None:
     # Given
     url = reverse("logout_process")

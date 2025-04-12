@@ -14,7 +14,7 @@ LOGIN_PROCESS_NAME = "login_process"
 DASHBOARD_VIEW_NAME = "allergy:dashboard"
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_login_view_with_anonymous_user(anonymous_client: Client) -> None:
     # Given
     url = reverse(LOGIN_VIEW_NAME)
@@ -31,7 +31,7 @@ def test_login_view_with_anonymous_user(anonymous_client: Client) -> None:
     assert isinstance(response.context["form"], LoginForm)
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_login_view_with_authenticated_user(authenticated_client: Client) -> None:
     # Given
     url = reverse(LOGIN_VIEW_NAME)
@@ -44,7 +44,7 @@ def test_login_view_with_authenticated_user(authenticated_client: Client) -> Non
     assertRedirects(response, expected_redirect)
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_login_view_with_incorrect_rest_method(anonymous_client: Client) -> None:
     # Given
     url = reverse(LOGIN_VIEW_NAME)
@@ -56,7 +56,7 @@ def test_login_view_with_incorrect_rest_method(anonymous_client: Client) -> None
     assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     ("remember_me_payload_value", "expected_expiry_age"),
     [
@@ -98,7 +98,7 @@ def test_login_process(remember_me_payload_value: str | None, expected_expiry_ag
         assertRedirects(expired_response, expected_redirect_for_expired_session)
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_login_process_with_incorrect_data(user: User, anonymous_client: Client) -> None:
     # Given
     url = reverse(LOGIN_PROCESS_NAME)
@@ -118,7 +118,7 @@ def test_login_process_with_incorrect_data(user: User, anonymous_client: Client)
     assert ["Incorrect username or password. Please try again."] == form.non_field_errors()
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_login_process_with_incorrect_rest_method(anonymous_client: Client) -> None:
     # Given
     url = reverse(LOGIN_PROCESS_NAME)
@@ -130,7 +130,7 @@ def test_login_process_with_incorrect_rest_method(anonymous_client: Client) -> N
     assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_login_process_with_missing_payload(anonymous_client: Client) -> None:
     # Given
     url = reverse(LOGIN_PROCESS_NAME)

@@ -19,7 +19,7 @@ def calendar_url(year: int, month: int, day: int | None = None) -> str:
     return reverse(PARTIAL_CALENDAR_VIEW_NAME, kwargs=kwargs)
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_partial_calendar_anonymous_user(anonymous_client: Client) -> None:
     # Given
     url = calendar_url(2024, 5, 15)
@@ -33,7 +33,7 @@ def test_partial_calendar_anonymous_user(anonymous_client: Client) -> None:
     assertRedirects(response, expected_redirect_url)
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_partial_calendar_view_with_day(authenticated_client: Client) -> None:
     # Given
     year, month, day = 2024, 4, 15
@@ -77,7 +77,7 @@ def test_partial_calendar_view_with_day(authenticated_client: Client) -> None:
     assert "bg-blue-500" in button_classes.split()
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_partial_calendar_view_without_day(authenticated_client: Client) -> None:
     # Given
     year, month = 2024, 6
@@ -101,7 +101,7 @@ def test_partial_calendar_view_without_day(authenticated_client: Client) -> None
     assertNotContains(response, "bg-blue-500", html=True)
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     ("year", "month", "expected_prev_year", "expected_prev_month"),
     [
@@ -130,7 +130,7 @@ def test_partial_calendar_previous_month_logic(
     assertContains(response, f'hx-get="{expected_prev_url}"')
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     ("year", "month", "expected_next_year", "expected_next_month"),
     [
@@ -160,7 +160,7 @@ def test_partial_calendar_next_month_logic(
     assertContains(response, f'hx-get="{expected_next_url}"')
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_partial_calendar_htmx_request_renders_correctly(authenticated_client: Client) -> None:
     # Given
     year, month, day = 2024, 7, 4
@@ -177,7 +177,7 @@ def test_partial_calendar_htmx_request_renders_correctly(authenticated_client: C
     assert response.context["selected_day"] == day
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     ("year", "month", "day"),
     [
@@ -202,7 +202,7 @@ def test_partial_calendar_invalid_date_value_returns_400(
     assert b"Invalid date parameters provided." in response.content
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     ("year", "month", "day"),
     [
@@ -232,7 +232,7 @@ def test_partial_calendar_invalid_format_redirects(
     assertRedirects(response, expected_redirect_url)
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_partial_calendar_post_not_allowed(authenticated_client: Client) -> None:
     # Given
     url = calendar_url(2024, 8, 1)

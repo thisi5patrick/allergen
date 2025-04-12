@@ -7,10 +7,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 1
-      matrix:
-        python-version: ["3.13"]
 
     services:
       postgres:
@@ -31,32 +27,32 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+
+    - name: "Set up Python"
       uses: actions/setup-python@v5
       with:
-        python-version: ${{ matrix.python-version }}
-
-    - name: Install uv
-      run: pip install uv
+        python-version-file: ".python-version"
 
     - name: Cache UV environment
       uses: actions/cache@v4
       with:
         path: .venv
-        key: ${{ runner.os }}-uv-${{ matrix.python-version }}-${{ hashFiles('**/uv.lock') }}
+        key: ${{ runner.os }}-uv-${{ hashFiles('**/uv.lock') }}
         restore-keys: |
-          ${{ runner.os }}-uv-${{ matrix.python-version }}-
+          ${{ runner.os }}-uv-
 
     - name: Install Dependencies using UV
       run: |
         uv venv .venv
         source .venv/bin/activate
-        uv sync -g dev
+        uv sync --dev
 
     - name: Lint with Ruff
       run: |
         source .venv/bin/activate
-        ruff check . --format=github --verbose
+        ruff check . --output-format github --verbose
 
     - name: Check formatting with Ruff
       run: |

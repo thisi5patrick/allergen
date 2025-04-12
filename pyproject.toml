@@ -61,7 +61,9 @@ ignore_errors = true
 
 [tool.ruff]
 line-length = 120
-lint.select = [
+
+[tool.ruff.lint]
+select = [
     "F", # pyflakes
     "I", # isort
     "RUF", # ruff specific rules

@@ -14,7 +14,7 @@ REGISTRATION_PROCESS_NAME = "registration_process"
 DASHBOARD_VIEW_NAME = "allergy:dashboard"
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_registration_view_with_anonymous_user(anonymous_client: Client) -> None:
     # Given
     url = reverse(REGISTRATION_VIEW_NAME)
@@ -31,7 +31,7 @@ def test_registration_view_with_anonymous_user(anonymous_client: Client) -> None
     assert isinstance(response.context["form"], RegistrationForm)
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_registration_view_with_authenticated_user(authenticated_client: Client) -> None:
     # Given
     url = reverse(REGISTRATION_VIEW_NAME)
@@ -44,7 +44,7 @@ def test_registration_view_with_authenticated_user(authenticated_client: Client)
     assertRedirects(response, expected_redirect)
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_registration_view_with_incorrect_rest_method(anonymous_client: Client) -> None:
     # Given
     url = reverse(REGISTRATION_VIEW_NAME)
@@ -56,7 +56,7 @@ def test_registration_view_with_incorrect_rest_method(anonymous_client: Client) 
     assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_registration_process(anonymous_client: Client) -> None:
     # Given
     url = reverse(REGISTRATION_PROCESS_NAME)
@@ -87,7 +87,7 @@ def test_registration_process(anonymous_client: Client) -> None:
     assert SymptomType.objects.filter(user=user, name="Headache").exists()
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_registration_process_with_incorrect_rest_method(anonymous_client: Client) -> None:
     # Given
     url = reverse(REGISTRATION_PROCESS_NAME)
@@ -99,7 +99,7 @@ def test_registration_process_with_incorrect_rest_method(anonymous_client: Clien
     assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_registration_process_with_missing_payload(anonymous_client: Client) -> None:
     # Given
     url = reverse(REGISTRATION_PROCESS_NAME)
@@ -156,7 +156,7 @@ def test_registration_process_with_missing_payload(anonymous_client: Client) -> 
         ),
     ],
 )
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_registration_process_incorrect_payload(
     payload: dict[str, str], field: str, error_message: str, anonymous_client: Client
 ) -> None:
@@ -175,7 +175,7 @@ def test_registration_process_incorrect_payload(
     assert error_message in form.errors[field]
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_registration_process_with_already_existing_email(anonymous_client: Client) -> None:
     # Given
     url = reverse(REGISTRATION_PROCESS_NAME)
@@ -202,7 +202,7 @@ def test_registration_process_with_already_existing_email(anonymous_client: Clie
     assert "Email is already registered." in form.errors["email"]
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_registration_process_with_already_existing_username(anonymous_client: Client) -> None:
     # Given
     url = reverse(REGISTRATION_PROCESS_NAME)

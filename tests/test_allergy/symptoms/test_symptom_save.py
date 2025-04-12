@@ -18,7 +18,7 @@ SYMPTOM_SAVE_URL = "allergy:symptom_save_partial"
 LOGIN_URL_NAME = "login_view"
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_symptom_save_anonymous(anonymous_client: Client) -> None:
     # Given
     url = reverse(SYMPTOM_SAVE_URL)
@@ -32,7 +32,7 @@ def test_symptom_save_anonymous(anonymous_client: Client) -> None:
     assertRedirects(response, expected_redirect_url)
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_symptom_save_authenticated_create_valid(authenticated_client: Client, user: User) -> None:
     # Given
     symptom_type = SymptomTypeFactory.create(user=user)
@@ -69,7 +69,7 @@ def test_symptom_save_authenticated_create_valid(authenticated_client: Client, u
     assert "bg-blue-500" in button_classes_str.split()
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_symptom_save_authenticated_update_valid(authenticated_client: Client, user: User) -> None:
     # Given
     symptom_type = SymptomTypeFactory.create(user=user)
@@ -105,7 +105,7 @@ def test_symptom_save_authenticated_update_valid(authenticated_client: Client, u
     assert "bg-blue-500" in button_classes_str.split()
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     ("field_to_miss", "expected_error_part"),
     [
@@ -147,7 +147,7 @@ def test_symptom_save_missing_data(
     assertContains(response, expected_error_part)
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 @pytest.mark.parametrize("intensity_value", [1, 10])
 def test_symptom_save_boundary_intensity(authenticated_client: Client, user: User, intensity_value: int) -> None:
     # Given
@@ -173,7 +173,7 @@ def test_symptom_save_boundary_intensity(authenticated_client: Client, user: Use
     assert db_entry.intensity == intensity_value
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 @pytest.mark.parametrize("invalid_intensity", [0, 11, "abc"])
 def test_symptom_save_invalid_intensity(authenticated_client: Client, user: User, invalid_intensity: str | int) -> None:
     # Given
@@ -204,7 +204,7 @@ def test_symptom_save_invalid_intensity(authenticated_client: Client, user: User
     assertContains(response, "intensity")
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_symptom_save_invalid_date_format(authenticated_client: Client, user: User) -> None:
     # Given
     symptom_type = SymptomTypeFactory.create(user=user)
@@ -231,7 +231,7 @@ def test_symptom_save_invalid_date_format(authenticated_client: Client, user: Us
     assertContains(response, "Enter a valid date")
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_symptom_save_invalid_symptom_uuid_format_or_nonexistent(authenticated_client: Client, user: User) -> None:
     # Given
     url = reverse(SYMPTOM_SAVE_URL)
@@ -274,7 +274,7 @@ def test_symptom_save_invalid_symptom_uuid_format_or_nonexistent(authenticated_c
     assert response_garbage.context["symptom_type"] is None
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_symptom_save_wrong_user_symptom_uuid(authenticated_second_user_client: Client, user: User) -> None:
     # Given
     symptom_type_user1 = SymptomTypeFactory.create(user=user)
@@ -299,7 +299,7 @@ def test_symptom_save_wrong_user_symptom_uuid(authenticated_second_user_client: 
     assert response.context["symptom_type"] is None
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_symptom_save_get_not_allowed(authenticated_client: Client) -> None:
     # Given
     url = reverse(SYMPTOM_SAVE_URL)

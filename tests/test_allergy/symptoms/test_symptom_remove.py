@@ -17,7 +17,7 @@ LOGIN_URL_NAME = "login_view"
 DASHBOARD_URL_NAME = "allergy:dashboard"
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_symptom_remove_anonymous(anonymous_client: Client, user: User) -> None:
     # Given
     symptom_type = SymptomTypeFactory.create(user=user)
@@ -42,7 +42,7 @@ def test_symptom_remove_anonymous(anonymous_client: Client, user: User) -> None:
     assertRedirects(response, expected_redirect_url)
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_symptom_remove_authenticated_valid(authenticated_client: Client, user: User) -> None:
     # Given
     symptom_type = SymptomTypeFactory.create(user=user)
@@ -76,7 +76,7 @@ def test_symptom_remove_authenticated_valid(authenticated_client: Client, user: 
     assertContains(response, f'<div id="intensity-{symptom_type.uuid}" hx-swap-oob="true"></div>')
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_symptom_remove_authenticated_already_removed(authenticated_client: Client, user: User) -> None:
     # Given
     symptom_type = SymptomTypeFactory.create(user=user)
@@ -102,7 +102,7 @@ def test_symptom_remove_authenticated_already_removed(authenticated_client: Clie
     assertContains(response, 'hx-swap-oob="true"')
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_symptom_remove_authenticated_wrong_user_returns_400(
     authenticated_second_user_client: Client, user: User
 ) -> None:
@@ -129,7 +129,7 @@ def test_symptom_remove_authenticated_wrong_user_returns_400(
     assert SymptomEntry.objects.filter(pk=entry_user1.pk).exists()
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_symptom_remove_authenticated_symptom_type_not_found_returns_400(authenticated_client: Client) -> None:
     # Given
     invalid_uuid = uuid.uuid4()
@@ -151,7 +151,7 @@ def test_symptom_remove_authenticated_symptom_type_not_found_returns_400(authent
     assert b"Invalid or unknown symptom specified for removal." in response.content
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_symptom_remove_invalid_date(authenticated_client: Client, user: User) -> None:
     # Given
     symptom_type = SymptomTypeFactory.create(user=user)
@@ -172,7 +172,7 @@ def test_symptom_remove_invalid_date(authenticated_client: Client, user: User) -
     assert b"Invalid date parameters provided." in response.content
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_symptom_remove_get_not_allowed(authenticated_client: Client, user: User) -> None:
     # Given
     symptom_type = SymptomTypeFactory.create(user=user)

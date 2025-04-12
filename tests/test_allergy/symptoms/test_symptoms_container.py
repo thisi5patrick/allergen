@@ -18,7 +18,7 @@ LOGIN_URL_NAME = "login_view"
 DASHBOARD_URL_NAME = "allergy:dashboard"
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_symptoms_container_anonymous(anonymous_client: Client) -> None:
     # Given
     test_date = date(2024, 5, 20)
@@ -38,7 +38,7 @@ def test_symptoms_container_anonymous(anonymous_client: Client) -> None:
     assertRedirects(response, expected_redirect_url)
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_symptoms_container_authenticated(authenticated_client: Client, user: User) -> None:
     # Given
     symptom_type_1 = SymptomTypeFactory.create(user=user, name="Pollen")
@@ -112,7 +112,7 @@ def test_symptoms_container_authenticated(authenticated_client: Client, user: Us
     assert "bg-blue-500" in button_classes.split()
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_symptoms_container_no_entries_for_date(authenticated_client: Client, user: User) -> None:
     # Given
     symptom_type_1 = SymptomTypeFactory.create(user=user, name="Pollen")
@@ -158,7 +158,7 @@ def test_symptoms_container_no_entries_for_date(authenticated_client: Client, us
     assert len(individual_intensity_selectors) == 0, "Found unexpected individual intensity selectors"
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_symptoms_container_no_symptoms_defined(authenticated_client: Client, user: User) -> None:
     # Given
     entry_date = date(2024, 5, 21)
@@ -191,7 +191,7 @@ def test_symptoms_container_no_symptoms_defined(authenticated_client: Client, us
     assertNotContains(response, '<button id="symptom-')
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_symptoms_container_invalid_date(authenticated_client: Client) -> None:
     # Given
     url_kwargs = {"year": 2024, "month": 2, "day": 30}
@@ -205,7 +205,7 @@ def test_symptoms_container_invalid_date(authenticated_client: Client) -> None:
     assert b"Invalid date parameters provided." in response.content
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_symptoms_container_post_not_allowed(authenticated_client: Client) -> None:
     # Given
     url_kwargs = {"year": 2024, "month": 5, "day": 20}
