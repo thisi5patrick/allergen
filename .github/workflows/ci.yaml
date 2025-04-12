@@ -5,8 +5,144 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  setup:
+    name: Setup Environment & Install Deps
     runs-on: ubuntu-latest
+    outputs:
+      venv-path: ${{ steps.sync-deps.outputs.venv-path }}
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+
+    - name: Set up Python from .python-version
+      uses: actions/setup-python@v5
+      with:
+        python-version-file: ".python-version"
+
+    - name: Cache UV environment (Restore)
+      uses: actions/cache/restore@v4
+      id: cache-restore
+      with:
+        path: .venv
+        key: ${{ runner.os }}-uv-${{ hashFiles('**/uv.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-uv-
+
+    - name: Install Dependencies using UV
+      id: sync-deps
+      if: steps.cache-restore.outputs.cache-hit != 'true'
+      run: |
+        uv venv .venv --seed
+        source .venv/bin/activate
+        uv sync --dev
+        echo "venv-path=.venv" >> $GITHUB_OUTPUT
+
+    - name: Cache UV environment (Save)
+      uses: actions/cache/save@v4
+      if: steps.cache-restore.outputs.cache-hit != 'true'
+      with:
+        path: .venv
+        key: ${{ runner.os }}-uv-${{ hashFiles('**/uv.lock') }}
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+
+    - name: Set up Python from .python-version
+      uses: actions/setup-python@v5
+      with:
+        python-version-file: ".python-version"
+
+    - name: Restore Cached UV environment
+      uses: actions/cache/restore@v4
+      with:
+        path: .venv
+        key: ${{ runner.os }}-uv-${{ hashFiles('**/uv.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-uv-
+
+    - name: Lint with Ruff
+      run: |
+        source .venv/bin/activate # Activate the restored/created venv
+        ruff check . --output-format github --verbose
+
+  format:
+    name: Check Formatting (Ruff & djLint)
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+
+    - name: Set up Python from .python-version
+      uses: actions/setup-python@v5
+      with:
+        python-version-file: ".python-version"
+
+    - name: Restore Cached UV environment
+      uses: actions/cache/restore@v4
+      with:
+        path: .venv
+        key: ${{ runner.os }}-uv-${{ hashFiles('**/uv.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-uv-
+
+    - name: Check formatting with Ruff
+      run: |
+        source .venv/bin/activate
+        ruff format --check . --verbose
+
+    - name: Check Templates with djLint
+      run: |
+        source .venv/bin/activate
+        djlint --check .
+
+  typecheck:
+    name: Type Check
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+
+    - name: Set up Python from .python-version
+      uses: actions/setup-python@v5
+      with:
+        python-version-file: ".python-version"
+
+    - name: Restore Cached UV environment
+      uses: actions/cache/restore@v4
+      with:
+        path: .venv
+        key: ${{ runner.os }}-uv-${{ hashFiles('**/uv.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-uv-
+
+    - name: Type Check with mypy
+      run: |
+        source .venv/bin/activate
+        mypy .
+
+  test:
+    name: Run Tests & Coverage
+    runs-on: ubuntu-latest
+    needs: [setup, lint, format, typecheck]
 
     services:
       postgres:
@@ -30,44 +166,18 @@ jobs:
     - name: Install uv
       uses: astral-sh/setup-uv@v5
 
-    - name: "Set up Python"
+    - name: Set up Python from .python-version
       uses: actions/setup-python@v5
       with:
         python-version-file: ".python-version"
 
-    - name: Cache UV environment
-      uses: actions/cache@v4
+    - name: Restore Cached UV environment
+      uses: actions/cache/restore@v4
       with:
         path: .venv
         key: ${{ runner.os }}-uv-${{ hashFiles('**/uv.lock') }}
         restore-keys: |
           ${{ runner.os }}-uv-
-
-    - name: Install Dependencies using UV
-      run: |
-        uv venv .venv
-        source .venv/bin/activate
-        uv sync --dev
-
-    - name: Lint with Ruff
-      run: |
-        source .venv/bin/activate
-        ruff check . --output-format github --verbose
-
-    - name: Check formatting with Ruff
-      run: |
-        source .venv/bin/activate
-        ruff format --check . --verbose
-
-    - name: Check Templates with djLint
-      run: |
-        source .venv/bin/activate
-        djlint --check .
-
-    - name: Type Check with mypy
-      run: |
-        source .venv/bin/activate
-        mypy .
 
     - name: Run Tests with Coverage
       env:
