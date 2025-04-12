@@ -26,4 +26,5 @@ media/
 .DS_Store
 .coverage
 
+# Fly
 fly.toml
