@@ -1,12 +1,15 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from allergy import views
 
 urlpatterns = [
     path("", views.redirect_to_dashboard, name="index"),
     path("dashboard/", views.dashboard, name="dashboard"),
-    path("calendar/<int:year>/<int:month>/<int:day>/", views.partial_calendar, name="partial_calendar"),
-    path("calendar/<int:year>/<int:month>/", views.partial_calendar, name="partial_calendar_without_day"),
+    re_path(
+        r"^partial/calendar/(?P<year>\d{4})/(?P<month>\d{1,2})(?:/(?P<day>\d{1,2}))?/$",
+        views.partial_calendar,
+        name="partial_calendar",
+    ),
     path(
         "symptoms/<int:year>/<int:month>/<int:day>/",
         views.partial_symptoms_container,
@@ -16,3 +19,5 @@ urlpatterns = [
     path("symptom/remove/<uuid:symptom_uuid>/", views.partial_symptom_remove, name="partial_symptom_remove"),
     path("symptom/save/", views.partial_symptom_save, name="partial_symptom_save"),
 ]
+
+app_name = "allergy"

@@ -22,7 +22,7 @@ def test_logout_redirect_with_authenticated_user(authenticated_client: Client) -
     # Given
     url = reverse("logout_process")
     expected_redirect_url = reverse("login_view")
-    dashboard_url = reverse("dashboard")
+    dashboard_url = reverse("allergy:dashboard")
 
     # When
     response = authenticated_client.post(url, {})

@@ -13,7 +13,7 @@ from core.forms.registration import RegistrationForm
 
 def view_404(request: HttpRequest, exception: None | Exception = None) -> HttpResponse:
     if request.user.is_authenticated:
-        dashboard_redirect = reverse("dashboard")
+        dashboard_redirect = reverse("allergy:dashboard")
         return redirect(dashboard_redirect)
     login_redirect = reverse("login_view")
     return redirect(login_redirect)
@@ -23,7 +23,7 @@ def view_404(request: HttpRequest, exception: None | Exception = None) -> HttpRe
 @login_not_required
 def login_view(request: HttpRequest) -> HttpResponse:
     if request.user.is_authenticated:
-        dashboard_redirect = reverse("dashboard")
+        dashboard_redirect = reverse("allergy:dashboard")
         return redirect(dashboard_redirect)
 
     form = LoginForm()
@@ -44,7 +44,7 @@ def login_process(request: HttpRequest) -> HttpResponse:
             request.session.set_expiry(None)
 
         login(request, user)
-        dashboard_redirect = reverse("dashboard")
+        dashboard_redirect = reverse("allergy:dashboard")
         return redirect(dashboard_redirect)
 
     return render(request, "login/login_form_partial.html", {"form": form})
@@ -54,7 +54,7 @@ def login_process(request: HttpRequest) -> HttpResponse:
 @login_not_required
 def registration_view(request: HttpRequest) -> HttpResponse:
     if request.user.is_authenticated:
-        dashboard_redirect = reverse("dashboard")
+        dashboard_redirect = reverse("allergy:dashboard")
         return redirect(dashboard_redirect)
 
     form = RegistrationForm()
@@ -85,7 +85,7 @@ def registration_process(request: HttpRequest) -> HttpResponse:
 
         login(request, user)
 
-        dashboard_redirect = reverse("dashboard")
+        dashboard_redirect = reverse("allergy:dashboard")
         return redirect(dashboard_redirect)
 
     return render(request, "registration/registration_form_partial.html", {"form": form})

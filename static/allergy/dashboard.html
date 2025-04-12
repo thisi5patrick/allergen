@@ -7,14 +7,14 @@
             <div class="w-64 bg-white border shadow-lg rounded-xl p-4 mb-8">
                 <div class="flex items-center justify-between mb-4">
                     <div id="calendar-container"
-                         hx-get="{% url 'partial_calendar' year=current_year month=current_month day=current_day %}"
+                         hx-get="{% url 'allergy:partial_calendar' year=current_year month=current_month day=current_day %}"
                          hx-trigger="load"
                          hx-swap="innerHTML"></div>
                 </div>
             </div>
             <div class="w-auto bg-white rounded-lg shadow-md p-4">
                 <div id="allergy-symptoms"
-                     hx-get="{% url 'partial_symptoms_container' year=current_year month=current_month day=current_day %}"
+                     hx-get="{% url 'allergy:partial_symptoms_container' year=current_year month=current_month day=current_day %}"
                      hx-trigger="load"
                      hx-swap="innerHTML"></div>
             </div>

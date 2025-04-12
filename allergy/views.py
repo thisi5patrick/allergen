@@ -1,10 +1,11 @@
 import calendar
-from datetime import date
+from datetime import date, timedelta
 from typing import cast
 
 from django.contrib.auth.models import User
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from allergy.forms import AddSymptomForm
@@ -12,17 +13,14 @@ from allergy.models import SymptomEntry, SymptomType
 
 
 def redirect_to_dashboard(request: HttpRequest) -> HttpResponse:
-    return redirect("dashboard")
+    dashboard_redirect = reverse("allergy:dashboard")
+    return redirect(dashboard_redirect)
 
 
 @require_GET
 def dashboard(request: HttpRequest) -> HttpResponse:
-    user = cast(User, request.user)
-
-    symptom_types = SymptomType.objects.filter(user=user).all()
     today = date.today()
     context = {
-        "symptom_types": symptom_types,
         "current_year": today.year,
         "current_month": today.month,
         "current_day": today.day,
@@ -31,39 +29,49 @@ def dashboard(request: HttpRequest) -> HttpResponse:
 
 
 @require_GET
-def partial_calendar(request: HttpRequest, year: int, month: int, day: int | None = None) -> HttpResponse:
-    cal = calendar.monthcalendar(year, month)
-    month_name = calendar.month_name[month]
+def partial_calendar(request: HttpRequest, year: str, month: str, day: str | None = None) -> HttpResponse:
+    try:
+        year_int = int(year)
+        month_int = int(month)
+        day_int = int(day) if day is not None else None
 
-    prev_month = month - 1
-    prev_year = year
-    if prev_month == 0:
-        prev_month = 12
-        prev_year -= 1
+        target_day_for_validation = day_int if day_int else 1
+        target_date = date(year_int, month_int, target_day_for_validation)
 
-    next_month = month + 1
-    next_year = year
-    if next_month == 13:
-        next_month = 1
-        next_year += 1
+        year_int = target_date.year
+        month_int = target_date.month
 
-    selected_day = day
-    if day:
-        selected_date = date(year, month, day).strftime("%Y-%m-%d")
-    else:
-        selected_date = None
+    except (ValueError, TypeError):
+        return HttpResponseBadRequest("Invalid date parameters provided.")
+
+    cal_matrix = calendar.monthcalendar(year_int, month_int)
+    month_name = calendar.month_name[month_int]
+
+    prev_month_date = date(year_int, month_int, 1) - timedelta(days=1)
+    prev_month = prev_month_date.month
+    prev_year = prev_month_date.year
+
+    last_day_of_month = calendar.monthrange(year_int, month_int)[1]
+    next_month_date = date(year_int, month_int, last_day_of_month) + timedelta(days=1)
+    next_month = next_month_date.month
+    next_year = next_month_date.year
+
+    selected_day = day_int
+    selected_date_str = None
+    if selected_day:
+        selected_date_str = date(year_int, month_int, selected_day).strftime("%Y-%m-%d")
 
     context = {
-        "calendar": cal,
-        "month": month,
-        "month_name": month_name,
-        "year": year,
+        "calendar_matrix": cal_matrix,
+        "current_month_num": month_int,
+        "current_month_name": month_name,
+        "current_year": year_int,
         "prev_month": prev_month,
         "prev_year": prev_year,
         "next_month": next_month,
         "next_year": next_year,
         "selected_day": selected_day,
-        "selected_date": selected_date,
+        "selected_date_str": selected_date_str,
         "weekdays": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
     }
 

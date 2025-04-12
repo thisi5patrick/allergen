@@ -28,6 +28,7 @@ repos:
           - pytest-django
           - factory-boy
           - django-recaptcha
+          - parsel
 
   - repo: https://github.com/djlint/djLint
     rev: v1.36.4

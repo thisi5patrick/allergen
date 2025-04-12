@@ -21,6 +21,7 @@ dev = [
     "djlint>=1.36.4",
     "factory-boy>=3.3.3",
     "mypy>=1.15.0",
+    "parsel>=1.10.0",
     "pytest-django>=4.10.0",
     "pytest-env>=1.1.5",
     "ruff>=0.9.7",
@@ -104,4 +105,6 @@ django_settings_module = "config.settings"
 omit = [
     "**/migrations/**",
     "tests/**",
+    "**/__init__.py",
+    "**/urls.py",
 ]

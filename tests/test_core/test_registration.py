@@ -9,16 +9,18 @@ from pytest_django.asserts import assertRedirects, assertTemplateUsed
 from allergy.models import SymptomType
 from core.forms.registration import RegistrationForm
 
-REGISTRATION_VIEW = reverse("registration_view")
-REGISTRATION_PROCESS = reverse("registration_process")
+REGISTRATION_VIEW_NAME = "registration_view"
+REGISTRATION_PROCESS_NAME = "registration_process"
+DASHBOARD_VIEW_NAME = "allergy:dashboard"
 
 
 @pytest.mark.django_db()
 def test_registration_view_with_anonymous_user(anonymous_client: Client) -> None:
     # Given
+    url = reverse(REGISTRATION_VIEW_NAME)
 
     # When
-    response = anonymous_client.get(REGISTRATION_VIEW)
+    response = anonymous_client.get(url)
 
     # Then
     assert response.status_code == 200
@@ -32,10 +34,11 @@ def test_registration_view_with_anonymous_user(anonymous_client: Client) -> None
 @pytest.mark.django_db()
 def test_registration_view_with_authenticated_user(authenticated_client: Client) -> None:
     # Given
-    expected_redirect = reverse("dashboard")
+    url = reverse(REGISTRATION_VIEW_NAME)
+    expected_redirect = reverse(DASHBOARD_VIEW_NAME)
 
     # When
-    response = authenticated_client.get(REGISTRATION_VIEW)
+    response = authenticated_client.get(url)
 
     # Then
     assertRedirects(response, expected_redirect)
@@ -44,9 +47,10 @@ def test_registration_view_with_authenticated_user(authenticated_client: Client)
 @pytest.mark.django_db()
 def test_registration_view_with_incorrect_rest_method(anonymous_client: Client) -> None:
     # Given
+    url = reverse(REGISTRATION_VIEW_NAME)
 
     # WHen
-    response = anonymous_client.post(REGISTRATION_VIEW, {})
+    response = anonymous_client.post(url, {})
 
     # Then
     assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED
@@ -55,6 +59,9 @@ def test_registration_view_with_incorrect_rest_method(anonymous_client: Client) 
 @pytest.mark.django_db()
 def test_registration_process(anonymous_client: Client) -> None:
     # Given
+    url = reverse(REGISTRATION_PROCESS_NAME)
+    expected_redirect = reverse(DASHBOARD_VIEW_NAME)
+
     payload = {
         "username": "name",
         "email": "email@email.com",
@@ -64,11 +71,9 @@ def test_registration_process(anonymous_client: Client) -> None:
     }
 
     # When
-    response = anonymous_client.post(REGISTRATION_PROCESS, payload)
+    response = anonymous_client.post(url, payload)
 
     # Then
-    expected_redirect = reverse("dashboard")
-
     assertRedirects(response, expected_redirect)
 
     assert User.objects.count() == 1
@@ -85,9 +90,10 @@ def test_registration_process(anonymous_client: Client) -> None:
 @pytest.mark.django_db()
 def test_registration_process_with_incorrect_rest_method(anonymous_client: Client) -> None:
     # Given
+    url = reverse(REGISTRATION_PROCESS_NAME)
 
     # WHen
-    response = anonymous_client.get(REGISTRATION_PROCESS)
+    response = anonymous_client.get(url)
 
     # Then
     assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED
@@ -96,6 +102,7 @@ def test_registration_process_with_incorrect_rest_method(anonymous_client: Clien
 @pytest.mark.django_db()
 def test_registration_process_with_missing_payload(anonymous_client: Client) -> None:
     # Given
+    url = reverse(REGISTRATION_PROCESS_NAME)
     payload = {
         "email": "email@email.com",
         "password": "password",
@@ -103,7 +110,7 @@ def test_registration_process_with_missing_payload(anonymous_client: Client) -> 
     }
 
     # When
-    response = anonymous_client.post(REGISTRATION_PROCESS, payload)
+    response = anonymous_client.post(url, payload)
 
     # Then
     assert response.status_code == HTTPStatus.OK
@@ -154,9 +161,10 @@ def test_registration_process_incorrect_payload(
     payload: dict[str, str], field: str, error_message: str, anonymous_client: Client
 ) -> None:
     # Given
+    url = reverse(REGISTRATION_PROCESS_NAME)
 
     # When
-    response = anonymous_client.post(REGISTRATION_PROCESS, payload)
+    response = anonymous_client.post(url, payload)
 
     # Then
     assert response.status_code == HTTPStatus.OK
@@ -170,6 +178,7 @@ def test_registration_process_incorrect_payload(
 @pytest.mark.django_db()
 def test_registration_process_with_already_existing_email(anonymous_client: Client) -> None:
     # Given
+    url = reverse(REGISTRATION_PROCESS_NAME)
     existing_email = "some-email@email.com"
     User.objects.create_user(username="some-username", email=existing_email, password="some-password")
 
@@ -182,7 +191,7 @@ def test_registration_process_with_already_existing_email(anonymous_client: Clie
     }
 
     # When
-    response = anonymous_client.post(REGISTRATION_PROCESS, payload)
+    response = anonymous_client.post(url, payload)
 
     # Then
     assert response.status_code == HTTPStatus.OK
@@ -196,6 +205,7 @@ def test_registration_process_with_already_existing_email(anonymous_client: Clie
 @pytest.mark.django_db()
 def test_registration_process_with_already_existing_username(anonymous_client: Client) -> None:
     # Given
+    url = reverse(REGISTRATION_PROCESS_NAME)
     existing_username = "some-email@email.com"
     User.objects.create_user(username=existing_username, password="some-password")
 
@@ -208,7 +218,7 @@ def test_registration_process_with_already_existing_username(anonymous_client: C
     }
 
     # When
-    response = anonymous_client.post(REGISTRATION_PROCESS, payload)
+    response = anonymous_client.post(url, payload)
 
     # Then
     assert response.status_code == HTTPStatus.OK
