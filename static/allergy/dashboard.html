@@ -14,7 +14,7 @@
             </div>
             <div class="w-auto bg-white rounded-lg shadow-md p-4">
                 <div id="allergy-symptoms"
-                     hx-get="{% url 'allergy:partial_symptoms_container' year=current_year month=current_month day=current_day %}"
+                     hx-get="{% url 'allergy:symptoms_container_partial' year=current_year month=current_month day=current_day %}"
                      hx-trigger="load"
                      hx-swap="innerHTML"></div>
             </div>

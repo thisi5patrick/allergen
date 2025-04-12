@@ -1,8 +1,10 @@
 import calendar
+import uuid
 from datetime import date, timedelta
 from typing import cast
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect, render
 from django.urls import reverse
@@ -79,72 +81,118 @@ def partial_calendar(request: HttpRequest, year: str, month: str, day: str | Non
 
 
 @require_GET
-def partial_symptoms_container(request: HttpRequest, year: int, month: int, day: int) -> HttpResponse:
-    selected_date = date(year, month, day)
+def symptoms_container_partial(request: HttpRequest, year: int, month: int, day: int) -> HttpResponse:
+    try:
+        selected_date = date(year, month, day)
+    except ValueError:
+        return HttpResponseBadRequest("Invalid date parameters provided.")
+
     user = cast(User, request.user)
 
-    symptom_entries = SymptomEntry.objects.filter(user=user).filter(entry_date=selected_date).all()
+    symptom_entries = (
+        SymptomEntry.objects.filter(user=user, entry_date=selected_date).select_related("symptom_type").all()
+    )
     all_symptom_types = SymptomType.objects.filter(user=user).all()
-    selected_symptoms = {entry.symptom_type: entry for entry in symptom_entries}
 
-    cal = calendar.monthcalendar(year, month)
-    selected_day = day
+    selected_symptoms_map = {entry.symptom_type: entry for entry in symptom_entries}
+
+    cal_matrix = calendar.monthcalendar(year, month)
 
     context = {
         "symptom_entries": symptom_entries,
         "symptom_types": all_symptom_types,
-        "selected_symptoms": selected_symptoms,
-        "calendar": cal,
-        "month": month,
-        "year": year,
-        "selected_day": selected_day,
-        "selected_date": selected_date.strftime("%Y-%m-%d"),
+        "selected_symptoms_map": selected_symptoms_map,
+        "selected_date": selected_date,
+        "selected_date_str": selected_date.strftime("%Y-%m-%d"),
+        "calendar_matrix": cal_matrix,
+        "current_year": year,
+        "current_month_num": month,
+        "selected_day": day,
         "weekdays": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
     }
 
-    return render(request, "allergy/partials/symptoms/container_allergy_symptoms.html", context)
+    return render(request, "allergy/partials/symptoms/symptoms_container.html", context)
 
 
 @require_GET
-def partial_symptom_add(request: HttpRequest, symptom_uuid: str) -> HttpResponse:
+def symptom_add_partial(request: HttpRequest, symptom_uuid: str) -> HttpResponse:
     user = cast(User, request.user)
-    symptom_type = SymptomType.objects.filter(user=user).get(uuid=symptom_uuid)
 
-    return render(request, "allergy/partials/symptoms/intensity/add_selector.html", {"symptom_type": symptom_type})
+    symptom_type = SymptomType.objects.filter(user=user, uuid=symptom_uuid).first()
+    if not symptom_type:
+        return HttpResponseBadRequest("Invalid or unknown symptom specified.")
+
+    selected_date_str = request.GET.get("selected_date")
+    selected_date_obj = None
+    if selected_date_str:
+        try:
+            selected_date_obj = date.fromisoformat(selected_date_str)
+        except ValueError:
+            pass
+
+    context = {
+        "symptom_type": symptom_type,
+        "selected_date": selected_date_obj,
+        "selected_date_str": selected_date_str,
+    }
+
+    return render(request, "allergy/partials/symptoms/intensity/add_selector.html", context)
 
 
 @require_http_methods(["DELETE"])
-def partial_symptom_remove(request: HttpRequest, symptom_uuid: str) -> HttpResponse:
-    user = cast(User, request.user)
-    symptom = SymptomEntry.objects.filter(symptom_type__uuid=symptom_uuid, user=user).first()
-    if symptom:
-        symptom.delete()
+def symptom_remove_partial(
+    request: HttpRequest, year: int, month: int, day: int, symptom_uuid: uuid.UUID
+) -> HttpResponse:
+    try:
+        selected_date = date(year, month, day)
+    except ValueError:
+        return HttpResponseBadRequest("Invalid date parameters provided.")
 
-    symptom_type = SymptomType.objects.filter(uuid=symptom_uuid).first()
-    return render(request, "allergy/partials/symptoms/intensity/remove_selector.html", {"symptom_type": symptom_type})
+    user = cast(User, request.user)
+
+    symptom_type = SymptomType.objects.filter(user=user, uuid=symptom_uuid).first()
+    if not symptom_type:
+        return HttpResponseBadRequest("Invalid or unknown symptom specified for removal.")
+
+    deleted_count, _ = SymptomEntry.objects.filter(
+        user=user, entry_date=selected_date, symptom_type=symptom_type
+    ).delete()
+
+    context = {
+        "symptom_type": symptom_type,
+        "selected_date": selected_date,
+        "selected_date_str": selected_date.strftime("%Y-%m-%d"),
+    }
+
+    return render(request, "allergy/partials/symptoms/intensity/remove_selector.html", context)
 
 
 @require_POST
-def partial_symptom_save(request: HttpRequest) -> HttpResponse:
+def symptom_save_partial(request: HttpRequest) -> HttpResponse:
     user = cast(User, request.user)
     form = AddSymptomForm(request.POST, user=user)
-    if not form.is_valid():
-        return render(
-            request,
-            "allergy/partials/symptoms/intensity/select_intensity.html",
-            {
-                "form": form,
-            },
-        )
 
-    entry = form.save()
-    symptom_type = entry.symptom_type
+    symptom_type: SymptomType | None
 
-    return render(
-        request,
-        "allergy/partials/symptoms/intensity/select_intensity.html",
-        {
+    if form.is_valid():
+        entry = form.save()
+        symptom_type = entry.symptom_type
+
+        context = {
             "symptom_type": symptom_type,
             "entry": entry,
-        },
-    )
+            "selected_date_str": entry.entry_date.strftime("%Y-%m-%d"),
+        }
+        return render(request, "allergy/partials/symptoms/intensity/select_intensity.html", context)
+
+    symptom_type = None
+    symptom_uuid_str = request.POST.get("symptom_uuid")
+    if symptom_uuid_str:
+        try:
+            symptom_type = SymptomType.objects.filter(user=user, uuid=symptom_uuid_str).first()
+        except (ValueError, ValidationError):
+            pass
+
+    context = {"form": form, "symptom_type": symptom_type, "selected_date_str": request.POST.get("selected_date")}
+
+    return render(request, "allergy/partials/symptoms/intensity/select_intensity.html", context)

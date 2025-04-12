@@ -11,13 +11,25 @@ urlpatterns = [
         name="partial_calendar",
     ),
     path(
-        "symptoms/<int:year>/<int:month>/<int:day>/",
-        views.partial_symptoms_container,
-        name="partial_symptoms_container",
+        "partial/symptoms/<int:year>/<int:month>/<int:day>/",
+        views.symptoms_container_partial,
+        name="symptoms_container_partial",
     ),
-    path("symptom/add/<uuid:symptom_uuid>/", views.partial_symptom_add, name="partial_symptom_add"),
-    path("symptom/remove/<uuid:symptom_uuid>/", views.partial_symptom_remove, name="partial_symptom_remove"),
-    path("symptom/save/", views.partial_symptom_save, name="partial_symptom_save"),
+    path(
+        "partial/symptom/add/<uuid:symptom_uuid>/",
+        views.symptom_add_partial,
+        name="symptom_add_partial",
+    ),
+    path(
+        "partial/symptom/remove/<int:year>/<int:month>/<int:day>/<uuid:symptom_uuid>/",
+        views.symptom_remove_partial,
+        name="symptom_remove_partial",
+    ),
+    path(
+        "partial/symptom/save/",
+        views.symptom_save_partial,
+        name="symptom_save_partial",
+    ),
 ]
 
 app_name = "allergy"

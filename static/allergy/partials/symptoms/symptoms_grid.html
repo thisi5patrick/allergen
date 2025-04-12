@@ -1,17 +1,8 @@
 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 mb-4">
     {% for symptom_type in symptom_types %}
         <button id="symptom-{{ symptom_type.uuid }}"
-                {% if symptom_type in selected_symptoms %} class="symptom-button px-3 py-2 text-sm rounded-lg bg-blue-500 text-white hover:bg-blue-100 transition-colors" hx-delete="{% url 'partial_symptom_remove' symptom_uuid=symptom_type.uuid %}" hx-target="#intensity-{{ symptom_type.uuid }}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' {% else %} class="symptom-button px-3 py-2 text-sm rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors" hx-get="{% url 'partial_symptom_add' symptom_uuid=symptom_type.uuid %}" hx-target="#intensity-container" hx-swap="afterbegin" {% endif %}>
+                {% if symptom_type in selected_symptoms_map %} class="symptom-button px-3 py-2 text-sm rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors" hx-delete="{% url 'allergy:symptom_remove_partial' year=selected_date.year month=selected_date.month day=selected_date.day symptom_uuid=symptom_type.uuid %}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' {% else %} class="symptom-button px-3 py-2 text-sm rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors" hx-get="{% url 'allergy:symptom_add_partial' symptom_uuid=symptom_type.uuid %}" hx-target="#intensity-container" hx-swap="afterbegin" hx-include="#selected-date" {% endif %}>
             {{ symptom_type.name }}
         </button>
-        {##}
-        {#        <button#}
-        {#            id="symptom-{{ symptom_type.uuid }}"#}
-        {#            class="symptom-button px-3 py-2 text-sm rounded-lg {% if symptom_type in selected_symptoms %}bg-blue-500 text-white{% else %}bg-blue-50 text-blue-700{% endif %} hover:bg-blue-100 transition-colors"#}
-        {#            hx-get="{% url 'partial_symptom_add' symptom_uuid=symptom_type.uuid %}"#}
-        {#            hx-target="#intensity-container"#}
-        {#            hx-swap="afterbegin">#}
-        {#            {{ symptom_type.name }}#}
-        {#        </button>#}
     {% endfor %}
 </div>

@@ -7,7 +7,7 @@
             <div class="flex flex-wrap gap-1">
                 {% for i in 1|range_filter:10 %}
                     <button class="w-8 h-8 rounded-full {% if symptom_entry.intensity == i %}bg-blue-500 text-white{% else %}bg-gray-200 text-gray-700{% endif %} hover:bg-blue-400 text-xs font-medium transition-colors"
-                            hx-post="{% url 'partial_symptom_save' %}"
+                            hx-post="{% url 'allergy:symptom_save_partial' %}"
                             hx-swap="outerHTML"
                             hx-target="#intensity-{{ symptom_entry.symptom_type.uuid }}"
                             hx-vals='{"symptom_uuid": "{{ symptom_entry.symptom_type.uuid }}", "intensity": "{{ i }}"}'

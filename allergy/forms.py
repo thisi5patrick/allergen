@@ -4,16 +4,19 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import Q
-from django.forms import CharField, ChoiceField, DateField, DateInput, Form, IntegerField, ModelChoiceField, ModelForm
+from django.forms import ChoiceField, DateField, Form, IntegerField, ModelForm, UUIDField
 from django.forms.widgets import Select, TextInput
 
 from allergy.models import Medications, SymptomEntry, SymptomType
 
 
 class AddSymptomForm(Form):
-    selected_date = DateField()
-    symptom_uuid = CharField()
-    intensity = IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)])
+    selected_date = DateField(required=True)
+    symptom_uuid = UUIDField(required=True)
+    intensity = IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(10)],
+        required=True,
+    )
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.user = kwargs.pop("user", None)
@@ -40,22 +43,6 @@ class AddSymptomForm(Form):
         )
 
         return entry
-
-
-class DeleteSymptomForm(Form):
-    symptom_type = ModelChoiceField(queryset=SymptomType.objects.none())
-    date = DateField(widget=DateInput())
-
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        self.user = kwargs.pop("user", None)
-        super().__init__(*args, **kwargs)
-        self.fields["symptom_type"].queryset = SymptomType.objects.filter(user=self.user).all()  # type: ignore
-
-    def delete(self) -> None:
-        entry_date = self.cleaned_data["date"]
-        symptom_type = self.cleaned_data["symptom_type"]
-
-        SymptomEntry.objects.filter(entry_date=entry_date, symptom_type=symptom_type).delete()
 
 
 class MedicationForm(ModelForm[Medications]):

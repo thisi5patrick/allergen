@@ -1,13 +1,13 @@
 from http import HTTPStatus
 
 import pytest
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import User
 from django.test import Client
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects, assertTemplateUsed
 
 from core.forms.login import LoginForm
-from tests.conftest import TEST_PASSWORD, TEST_USERNAME
+from tests.conftest import TEST_PASSWORD_1, TEST_USERNAME_1
 
 LOGIN_VIEW_NAME = "login_view"
 LOGIN_PROCESS_NAME = "login_process"
@@ -64,15 +64,15 @@ def test_login_view_with_incorrect_rest_method(anonymous_client: Client) -> None
         (None, 60 * 30),
     ],
 )
-def test_login_process(remember_me_payload_value: str | None, expected_expiry_age: int, user: AbstractUser) -> None:
+def test_login_process(remember_me_payload_value: str | None, expected_expiry_age: int, user: User) -> None:
     # Given
     url = reverse(LOGIN_PROCESS_NAME)
     expected_redirect = reverse(DASHBOARD_VIEW_NAME)
     expected_redirect_for_expired_session = reverse(LOGIN_VIEW_NAME)
 
     payload = {
-        "username": TEST_USERNAME,
-        "password": TEST_PASSWORD,
+        "username": TEST_USERNAME_1,
+        "password": TEST_PASSWORD_1,
     }
     if remember_me_payload_value is not None:
         payload["remember_me"] = remember_me_payload_value
@@ -99,7 +99,7 @@ def test_login_process(remember_me_payload_value: str | None, expected_expiry_ag
 
 
 @pytest.mark.django_db()
-def test_login_process_with_incorrect_data(user: AbstractUser, anonymous_client: Client) -> None:
+def test_login_process_with_incorrect_data(user: User, anonymous_client: Client) -> None:
     # Given
     url = reverse(LOGIN_PROCESS_NAME)
 
