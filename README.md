@@ -1,3 +1,6 @@
+[![CI Status](https://github.com/thisi5patrick/allergen/actions/workflows/ci.yml/badge.svg)](https://github.com/thisi5patrick/allergen/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/thisi5patrick/allergen/graph/badge.svg?token=N0TJKV66JJ)](https://codecov.io/gh/thisi5patrick/allergen)
+
 # Allergies Tracker
 
 A web application built with Django and HTMX for tracking daily allergies and symptoms. 
