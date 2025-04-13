@@ -162,7 +162,7 @@ def test_partial_save_symptom_duplicate_name(authenticated_client: Client, user:
 
     # Then
     assert response.status_code == HTTPStatus.OK
-    assertTemplateUsed(response, "settings/tabs/partials/symptoms/add_symptom_type.html")
+    assertTemplateUsed(response, "settings/tabs/partials/symptoms/add_symptom_type_oob.html")
 
     form = response.context["form"]
     assert isinstance(form, AddNewSymptomForm)

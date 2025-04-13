@@ -1,0 +1,24 @@
+{% if medications %}
+    <ul id="medication-list-ul" class="space-y-2">
+        {% for medication in medications %}
+            <li id="medication-item-{{ medication.uuid }}"
+                class="flex items-center justify-between bg-gray-50 hover:bg-gray-100 p-3 rounded-md border border-gray-200">
+                <div class="flex items-center space-x-3">
+                    {{ medication.icon_html|safe }}
+                    <span class="text-gray-800 font-medium">{{ medication.medication_name }}</span>
+                    <span class="text-gray-600 text-sm">({{ medication.get_medication_type_display }})</span>
+                </div>
+                <button hx-delete="{% url 'settings:partial_delete_medication' medication_uuid=medication.uuid %}"
+                        hx-target="closest li"
+                        hx-swap="outerHTML"
+                        hx-confirm="Are you sure you want to delete {{ medication.medication_name }}?"
+                        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                        class="text-red-500 hover:text-red-700 text-sm">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p id="no-medications-message" class="text-gray-500">No medications added yet.</p>
+{% endif %}

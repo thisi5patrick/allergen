@@ -36,8 +36,26 @@ food_allergy_urls = [
 
 medications_urls = [
     path("medications/", medications.medications_tab, name="medications_tab"),
-    path("medications/save/", medications.add_medication, name="add_medication"),
-    path("medications/<uuid:medication_uuid>/", medications.delete_medication, name="delete_medication"),
+    path(
+        "medications/existing/",
+        medications.partial_existing_medications,
+        name="partial_medication_list",
+    ),
+    path(
+        "medications/form/",
+        medications.partial_new_medication_form,
+        name="partial_new_medication_form",
+    ),
+    path(
+        "medications/save/",
+        medications.partial_new_medication_save,
+        name="partial_add_medication",
+    ),
+    path(
+        "medications/remove/<uuid:medication_uuid>/",
+        medications.partial_delete_medication,
+        name="partial_delete_medication",
+    ),
 ]
 
 account_urls = [

@@ -3,11 +3,10 @@ from typing import Any, cast
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.db.models import Q
 from django.forms import ChoiceField, DateField, Form, IntegerField, ModelForm, UUIDField
 from django.forms.widgets import Select, TextInput
 
-from allergy.models import Medications, SymptomEntry, SymptomType
+from allergy.models import Medication, SymptomEntry, SymptomType
 
 
 class AddSymptomForm(Form):
@@ -45,9 +44,9 @@ class AddSymptomForm(Form):
         return entry
 
 
-class MedicationForm(ModelForm[Medications]):
+class MedicationForm(ModelForm[Medication]):
     medication_type = ChoiceField(
-        choices=Medications.MedicationType.choices,
+        choices=Medication.MedicationType.choices,
         required=True,
         label="Medication Type",
         widget=Select(
@@ -59,7 +58,7 @@ class MedicationForm(ModelForm[Medications]):
     )
 
     class Meta:
-        model = Medications
+        model = Medication
         fields = ["medication_name", "medication_type"]
         widgets = {
             "medication_name": TextInput(
@@ -84,17 +83,23 @@ class MedicationForm(ModelForm[Medications]):
         if not cleaned_data:
             return {}
 
-        medication_type = cleaned_data["medication_type"]
-        medication_name = cleaned_data["medication_name"]
+        medication_type = cleaned_data.get("medication_type")
+        medication_name = cleaned_data.get("medication_name")
 
-        if Medications.objects.filter(
-            Q(medication_name=medication_name) & Q(medication_type=medication_type) & Q(user=self.user)
-        ).exists():
-            self.add_error("medication_name", "This medication with the same type already exists for you.")
+        if medication_name and medication_type and self.user:
+            queryset = Medication.objects.filter(
+                medication_name__iexact=medication_name, medication_type=medication_type, user=self.user
+            )
+
+            if self.instance and self.instance.pk:
+                queryset = queryset.exclude(pk=self.instance.pk)
+
+            if queryset.exists():
+                self.add_error("medication_name", "This medication with the same type already exists for you.")
 
         return cleaned_data
 
-    def save(self, commit: bool = True) -> Medications:
+    def save(self, commit: bool = True) -> Medication:
         instance = super().save(False)
         instance.user = cast(User, self.user)
         if commit:

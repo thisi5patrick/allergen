@@ -5,23 +5,22 @@
         <div>
             <h2 class="text-2xl font-bold text-gray-800 mb-2">Manage Medications</h2>
             <p class="text-gray-600 mb-6">Add medications you use or need to track.</p>
-            <div id="medication-form-container">
-                <div id="form-container"
-                     class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Add New Medication</h3>
-                    {% include "settings/tabs/partials/medications/new_medication_form.html" %}
-                </div>
+            <div id="medication-form-outer-container"
+                 class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-3">Add New Medication</h3>
+                <div id="medication-form-container"
+                     hx-get="{% url 'settings:partial_new_medication_form' %}"
+                     hx-trigger="load"
+                     hx-swap="innerHTML"></div>
             </div>
         </div>
-        <div id="medication-list"
+        <div id="medication-list-outer-container"
              class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
             <h3 class="text-lg font-semibold text-gray-800 mb-3">Your Medications</h3>
-            <ul id="medication-list-ul" class="space-y-2">
-                {% for medication in medications %}
-                    {% include "settings/tabs/partials/medications/medication_list_item.html" with medication=medication %}
-                {% endfor %}
-            </ul>
-            {% if not medications %}<p id="no-medications-message" class="text-gray-500">No medications added yet.</p>{% endif %}
+            <div id="medication-list-container"
+                 hx-get="{% url 'settings:partial_medication_list' %}"
+                 hx-trigger="load"
+                 hx-swap="innerHTML"></div>
         </div>
     </div>
 {% endblock user_content %}
