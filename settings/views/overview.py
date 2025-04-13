@@ -19,9 +19,7 @@ def overview_tab(request: HttpRequest) -> HttpResponse:
     days_with_symptoms = entries.values("entry_date").distinct().count()
     total_entries = entries.count()
     recent_symptoms = entries.select_related("symptom_type").order_by("-created_at")[:5]
-    top_symptoms = (
-        entries.values("symptom_type__name").annotate(count=Count("symptom_type__name")).order_by("-count")[:5]
-    )
+    top_symptoms = entries.values("symptom_type__name").annotate(count=Count("symptom_type")).order_by("-count")[:5]
 
     context = {
         "active_tab": ActiveTab.OVERVIEW,

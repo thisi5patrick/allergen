@@ -43,7 +43,7 @@
                         <div class="flex items-center">
                             <div class="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
                             <p class="text-gray-700 text-sm sm:text-base">
-                                {{ symptom.symptom_type.name }} (Intensity: {{ symptom.intensity }}) - {{ symptom.entry.entry_date|date:"M d, Y" }}
+                                {{ symptom.symptom_type.name }} (Intensity: {{ symptom.intensity }}) - {{ symptom.entry_date|date:"M d, Y" }}
                             </p>
                         </div>
                     {% endfor %}

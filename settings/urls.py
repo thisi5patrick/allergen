@@ -38,3 +38,5 @@ account_urls = [
 
 
 urlpatterns = overview_urls + symptoms_urls + food_allergy_urls + medications_urls + account_urls
+
+app_name = "settings"
