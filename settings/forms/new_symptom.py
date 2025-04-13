@@ -1,3 +1,4 @@
+import re
 from typing import Any
 
 from django import forms
@@ -6,7 +7,7 @@ from django.core.validators import RegexValidator
 from allergy.models import SymptomType
 
 
-class AddNewSymptomForm(forms.ModelForm):  # type: ignore[type-arg]
+class AddNewSymptomForm(forms.ModelForm[SymptomType]):
     name = forms.CharField(
         max_length=255,
         validators=[
@@ -16,6 +17,14 @@ class AddNewSymptomForm(forms.ModelForm):  # type: ignore[type-arg]
                 code="invalid_symptom_name",
             )
         ],
+        widget=forms.TextInput(
+            attrs={
+                "class": (
+                    "w-full px-3 py-2 border border-gray-300 rounded-md "
+                    "focus:outline-none focus:ring-2 focus:ring-purple-500",
+                )
+            }
+        ),
     )
 
     class Meta:
@@ -27,13 +36,17 @@ class AddNewSymptomForm(forms.ModelForm):  # type: ignore[type-arg]
         super().__init__(*args, **kwargs)
 
     def clean_name(self) -> str:
-        name: str = self.cleaned_data["name"]
-        if SymptomType.objects.filter(name=name.lower(), user=self.user).exists():
+        name_raw: str = self.cleaned_data["name"]
+        name_stripped = name_raw.strip()
+        name_normalized = re.sub(r"\s{2,}", " ", name_stripped)
+
+        if SymptomType.objects.filter(name__iexact=name_normalized, user=self.user).exists():
             raise forms.ValidationError("You already have a symptom with this name.")
-        return name
+
+        return name_normalized
 
     def save(self, commit: bool = True) -> SymptomType:
-        instance: SymptomType = super().save(commit=False)
+        instance = super().save(commit=False)
         instance.user = self.user
         if commit:
             instance.save()

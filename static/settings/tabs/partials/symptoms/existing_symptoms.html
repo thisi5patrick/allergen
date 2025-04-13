@@ -1,14 +1,20 @@
 {% if symptom_types %}
-    <div id="symptoms-list-container" class="divide-y divide-gray-200">
+    <div class="divide-y divide-gray-200">
         {% for symptom_type in symptom_types %}
             <div id="symptom-type-{{ symptom_type.uuid }}"
                  class="py-3 flex items-center justify-between">
                 <div class="flex items-center">
                     <div class="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
                     <span class="text-gray-800 font-medium">{{ symptom_type.name }}</span>
-                    <span class="ml-2 text-sm text-gray-500">- {{ symptom_type.entries_count }} Entries</span>
+                    <span class="ml-2 text-sm text-gray-500">- {{ symptom_type.entries_count }}
+                        {% if symptom_type.entries_count == 1 %}
+                            Entry
+                        {% else %}
+                            Entries
+                        {% endif %}
+                    </span>
                 </div>
-                <button hx-delete="{% url 'partial_symptom_type_remove' symptom_type_uuid=symptom_type.uuid %}"
+                <button hx-delete="{% url 'settings:partial_symptom_type_remove' symptom_type_uuid=symptom_type.uuid %}"
                         hx-confirm="Are you sure you want to delete this symptom? All related entries will be permanently removed."
                         hx-target="#symptom-type-{{ symptom_type.uuid }}"
                         hx-swap="outerHTML"
