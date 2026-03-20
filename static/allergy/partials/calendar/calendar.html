@@ -1,12 +1,12 @@
 <div class="flex justify-between items-center mb-4">
-    <button hx-get="{% url 'allergy:partial_calendar' year=prev_year month=prev_month %}"
+    <button hx-get="{% if explicit_selected_date_str %}{% url 'allergy:partial_calendar' year=prev_year month=prev_month %}?selected_date={{ explicit_selected_date_str }}{% else %}{% url 'allergy:partial_calendar' year=prev_year month=prev_month %}{% endif %}"
             hx-target="#calendar-container"
             hx-swap="innerHTML"
             class="text-gray-600 hover:text-gray-800">
         <i class="fas fa-chevron-left"></i>
     </button>
     <h2 id="monthYear" class="text-xl font-semibold">{{ current_month_name }} {{ current_year }}</h2>
-    <button hx-get="{% url 'allergy:partial_calendar' year=next_year month=next_month %}"
+    <button hx-get="{% if explicit_selected_date_str %}{% url 'allergy:partial_calendar' year=next_year month=next_month %}?selected_date={{ explicit_selected_date_str }}{% else %}{% url 'allergy:partial_calendar' year=next_year month=next_month %}{% endif %}"
             hx-target="#calendar-container"
             hx-swap="innerHTML"
             class="text-gray-600 hover:text-gray-800">
@@ -15,7 +15,7 @@
 </div>
 <div id="calendar-grid" class="grid grid-cols-7 gap-1">
     {% for day in weekdays %}<div class="text-center text-sm font-medium text-gray-500">{{ day }}</div>{% endfor %}
-    {% include "allergy/partials/calendar/calendar_grid.html" with calendar=calendar_matrix year=current_year month=current_month_num selected_day=selected_day %}
+    {% include "allergy/partials/calendar/calendar_grid.html" with calendar=calendar_matrix year=current_year month=current_month_num selected_day=selected_day days_with_entries=days_with_entries %}
 </div>
 {% if selected_date_str %}
     <input type="hidden"

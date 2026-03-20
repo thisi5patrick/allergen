@@ -40,9 +40,7 @@ def test_dashboard_view_with_authenticated_user(authenticated_client: Client) ->
     today = date.today()
     expected_year = today.year
     expected_month = today.month
-    expected_day = today.day
-
-    expected_calendar_url = calendar_url(expected_year, expected_month, expected_day)
+    expected_calendar_url = calendar_url(expected_year, expected_month)
 
     # When
     response = authenticated_client.get(dashboard_url)

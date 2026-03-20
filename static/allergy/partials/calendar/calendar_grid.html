@@ -5,8 +5,11 @@
                 <button hx-get="{% url 'allergy:symptoms_container_partial' year=year month=month day=day_num %}"
                         hx-target="#allergy-symptoms"
                         hx-swap="innerHTML"
-                        class="py-1 block w-full text-sm cursor-pointer hover:bg-gray-200 rounded {% if day_num == selected_day %} bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto leading-none font-semibold {% else %} w-8 h-8 flex items-center justify-center mx-auto {% endif %}">
+                        class="relative py-1 block w-full text-sm cursor-pointer hover:bg-gray-200 rounded {% if day_num == selected_day %} bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto leading-none font-semibold {% else %} w-8 h-8 flex items-center justify-center mx-auto {% endif %}">
                     {{ day_num }}
+                    {% if day_num in days_with_entries %}
+                        <span class="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full {% if day_num == selected_day %}bg-white{% else %}bg-blue-500{% endif %}"></span>
+                    {% endif %}
                 </button>
             </div>
         {% else %}

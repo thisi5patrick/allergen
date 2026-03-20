@@ -7,7 +7,7 @@
             <div class="grid grid-cols-1 items-start gap-6 xl:grid-cols-[18rem_minmax(0,1fr)]">
                 <div class="self-start bg-white border shadow-lg rounded-2xl p-4">
                     <div id="calendar-container"
-                         hx-get="{% url 'allergy:partial_calendar' year=current_year month=current_month day=current_day %}"
+                         hx-get="{% url 'allergy:partial_calendar' year=current_year month=current_month %}"
                          hx-trigger="load"
                          hx-swap="innerHTML">
                         <div class="animate-pulse space-y-4">

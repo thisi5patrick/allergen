@@ -2,10 +2,13 @@ from datetime import date
 from http import HTTPStatus
 
 import pytest
+from django.contrib.auth.models import User
 from django.test import Client
 from django.urls import reverse
 from parsel import Selector
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects, assertTemplateUsed
+
+from tests.factories.symptom_entry import SymptomEntryFactory
 
 PARTIAL_CALENDAR_VIEW_NAME = "allergy:partial_calendar"
 DASHBOARD_VIEW_NAME = "allergy:dashboard"
@@ -78,6 +81,24 @@ def test_partial_calendar_view_with_day(authenticated_client: Client) -> None:
 
 
 @pytest.mark.django_db
+def test_partial_calendar_marks_days_with_entries(authenticated_client: Client, user: User) -> None:
+    # Given
+    SymptomEntryFactory.create(user=user, entry_date=date(2024, 4, 9))
+    SymptomEntryFactory.create(user=user, entry_date=date(2024, 4, 9))
+    SymptomEntryFactory.create(user=user, entry_date=date(2024, 4, 21))
+
+    url = calendar_url(2024, 4, 15)
+
+    # When
+    response = authenticated_client.get(url)
+
+    # Then
+    assert response.status_code == HTTPStatus.OK
+    assert sorted(response.context["days_with_entries"]) == [9, 21]
+    assertContains(response, "bottom-0.5 left-1/2")
+
+
+@pytest.mark.django_db
 def test_partial_calendar_view_without_day(authenticated_client: Client) -> None:
     # Given
     year, month = 2024, 6
@@ -99,6 +120,21 @@ def test_partial_calendar_view_without_day(authenticated_client: Client) -> None
     assert context["selected_date_str"] is None
 
     assertNotContains(response, "bg-blue-500", html=True)
+
+
+@pytest.mark.django_db
+def test_partial_calendar_current_month_defaults_to_today_when_day_missing(authenticated_client: Client) -> None:
+    # Given
+    today = date.today()
+    url = calendar_url(today.year, today.month)
+
+    # When
+    response = authenticated_client.get(url)
+
+    # Then
+    assert response.status_code == HTTPStatus.OK
+    assert response.context["selected_day"] == today.day
+    assert response.context["selected_date_str"] == today.strftime("%Y-%m-%d")
 
 
 @pytest.mark.django_db
@@ -158,6 +194,82 @@ def test_partial_calendar_next_month_logic(
 
     expected_next_url = calendar_url(expected_next_year, expected_next_month)
     assertContains(response, f'hx-get="{expected_next_url}"')
+
+
+@pytest.mark.django_db
+def test_partial_calendar_month_navigation_preserves_explicit_selected_date(authenticated_client: Client) -> None:
+    # Given
+    url = calendar_url(2024, 5, 15)
+
+    # When
+    response = authenticated_client.get(url)
+
+    # Then
+    assertContains(response, f'hx-get="{calendar_url(2024, 4)}?selected_date=2024-05-15"')
+    assertContains(response, f'hx-get="{calendar_url(2024, 6)}?selected_date=2024-05-15"')
+
+
+@pytest.mark.django_db
+def test_partial_calendar_clamps_selected_day_for_shorter_month(authenticated_client: Client) -> None:
+    # Given
+    url = calendar_url(2024, 3, 31)
+
+    # When
+    response = authenticated_client.get(url)
+
+    # Then
+    assert response.status_code == HTTPStatus.OK
+    assertContains(response, f'hx-get="{calendar_url(2024, 2)}?selected_date=2024-03-31"')
+
+
+@pytest.mark.django_db
+def test_partial_calendar_with_explicit_selected_date_in_other_month_has_no_selected_day(
+    authenticated_client: Client,
+) -> None:
+    # Given
+    url = f"{calendar_url(2024, 5)}?selected_date=2024-06-10"
+
+    # When
+    response = authenticated_client.get(url)
+
+    # Then
+    assert response.status_code == HTTPStatus.OK
+    assert response.context["selected_day"] is None
+    assert response.context["selected_date_str"] is None
+
+
+@pytest.mark.django_db
+def test_partial_calendar_keeps_exact_selected_date_across_month_navigation(authenticated_client: Client) -> None:
+    # Given
+    url = f"{calendar_url(2024, 5)}?selected_date=2024-06-25"
+
+    # When
+    response = authenticated_client.get(url)
+
+    # Then
+    assert response.status_code == HTTPStatus.OK
+    assert response.context["selected_day"] is None
+    assertContains(response, f'hx-get="{calendar_url(2024, 6)}?selected_date=2024-06-25"')
+    assertContains(response, f'hx-get="{calendar_url(2024, 4)}?selected_date=2024-06-25"')
+
+
+@pytest.mark.django_db
+def test_partial_calendar_does_not_fallback_to_today_when_explicit_selected_date_is_in_other_month(
+    authenticated_client: Client,
+) -> None:
+    # Given
+    today = date.today()
+    other_month = 12 if today.month == 1 else today.month - 1
+    other_year = today.year - 1 if today.month == 1 else today.year
+    url = f"{calendar_url(today.year, today.month)}?selected_date={other_year:04d}-{other_month:02d}-25"
+
+    # When
+    response = authenticated_client.get(url)
+
+    # Then
+    assert response.status_code == HTTPStatus.OK
+    assert response.context["selected_day"] is None
+    assert response.context["selected_date_str"] is None
 
 
 @pytest.mark.django_db

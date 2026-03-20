@@ -96,6 +96,7 @@ def test_symptoms_container_authenticated(authenticated_client: Client, user: Us
     assert context["current_year"] == entry_date.year
     assert context["selected_day"] == entry_date.day
     assert "weekdays" in context
+    assert context["days_with_entries"] == [entry_date.day]
 
     assertContains(response, f'id="symptom-{symptom_type_1.uuid}"')
     assertContains(response, f'hx-delete="{expected_remove_url}"')
