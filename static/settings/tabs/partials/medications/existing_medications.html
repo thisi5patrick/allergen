@@ -8,11 +8,15 @@
                     <span class="text-gray-800 font-medium">{{ medication.medication_name }}</span>
                     <span class="text-gray-600 text-sm">({{ medication.get_medication_type_display }})</span>
                 </div>
-                <button hx-delete="{% url 'settings:partial_delete_medication' medication_uuid=medication.uuid %}"
-                        hx-target="closest li"
-                        hx-swap="outerHTML"
-                        hx-confirm="Are you sure you want to delete {{ medication.medication_name }}?"
-                        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                <button type="button"
+                        data-confirm-method="DELETE"
+                        data-confirm-url="{% url 'settings:partial_delete_medication' medication_uuid=medication.uuid %}"
+                        data-confirm-target="#medication-list-container"
+                        data-confirm-swap="innerHTML"
+                        data-confirm-csrf="{{ csrf_token }}"
+                        data-confirm-title="Delete medication?"
+                        data-confirm-message="This will remove {{ medication.medication_name }} from your tracked medications."
+                        data-confirm-button="Delete"
                         class="text-red-500 hover:text-red-700 text-sm">
                     <i class="fas fa-trash"></i>
                 </button>

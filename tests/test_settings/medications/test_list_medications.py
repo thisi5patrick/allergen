@@ -80,6 +80,12 @@ def test_partial_medication_list_with_medications(authenticated_client: Client, 
     assertContains(response, med1.medication_name)
     assertContains(response, med1.get_medication_type_display())
     assertContains(response, reverse(DELETE_MEDICATION_PARTIAL_URL_NAME, kwargs=expected_delete_url_1_kwargs))
+    assertContains(response, 'data-confirm-method="DELETE"')
+    assertContains(
+        response,
+        f'data-confirm-url="{reverse(DELETE_MEDICATION_PARTIAL_URL_NAME, kwargs=expected_delete_url_1_kwargs)}"',
+    )
+    assertContains(response, 'data-confirm-target="#medication-list-container"')
 
     assertContains(response, f'<li id="medication-item-{med2.uuid}"')
     assertContains(response, med2.medication_name)

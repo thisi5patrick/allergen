@@ -84,8 +84,11 @@ def test_partial_existing_symptoms_with_symptoms(authenticated_client: Client, u
     assertContains(response, "0")
     assertContains(response, "Entries")
     assertContains(response, reverse(REMOVE_SYMPTOM_PARTIAL_URL_NAME, kwargs=expected_remove_url_a_kwargs))
-    assertContains(response, "data-delete-symptom-url=")
-    assertContains(response, f'data-symptom-name="{type_a.name}"')
+    assertContains(response, 'data-confirm-method="DELETE"')
+    assertContains(
+        response, f'data-confirm-url="{reverse(REMOVE_SYMPTOM_PARTIAL_URL_NAME, kwargs=expected_remove_url_a_kwargs)}"'
+    )
+    assertContains(response, 'data-confirm-target="#existing-symptoms-container"')
     assertContains(response, f'id="symptom-type-{type_b.uuid}"')
     assertContains(response, f"{type_b.name}")
     assertContains(response, "2")

@@ -22,6 +22,76 @@
             {% block content %}
             {% endblock content %}
         </div>
+        {% include "partials/confirm_modal.html" %}
         {{ form.media }}
+        <script>
+            (() => {
+                const modal = document.getElementById("confirm-modal");
+                const title = document.getElementById("confirm-modal-title");
+                const message = document.getElementById("confirm-modal-message");
+                const cancelButton = document.getElementById("confirm-modal-cancel");
+                const confirmButton = document.getElementById("confirm-modal-submit");
+
+                if (!modal || !title || !message || !cancelButton || !confirmButton) {
+                    return;
+                }
+
+                let pendingAction = null;
+
+                const closeModal = () => {
+                    pendingAction = null;
+                    modal.classList.add("hidden");
+                    modal.classList.remove("flex");
+                };
+
+                document.body.addEventListener("click", (event) => {
+                    const trigger = event.target.closest("[data-confirm-url]");
+                    if (!trigger) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    pendingAction = {
+                        method: trigger.getAttribute("data-confirm-method") || "POST",
+                        url: trigger.getAttribute("data-confirm-url"),
+                        target: trigger.getAttribute("data-confirm-target"),
+                        swap: trigger.getAttribute("data-confirm-swap") || "innerHTML",
+                        csrf: trigger.getAttribute("data-confirm-csrf"),
+                    };
+                    title.textContent = trigger.getAttribute("data-confirm-title") || "Confirm action";
+                    message.textContent = trigger.getAttribute("data-confirm-message") || "";
+                    confirmButton.textContent = trigger.getAttribute("data-confirm-button") || "Confirm";
+                    modal.classList.remove("hidden");
+                    modal.classList.add("flex");
+                });
+
+                cancelButton.addEventListener("click", closeModal);
+
+                modal.addEventListener("click", (event) => {
+                    if (event.target === modal) {
+                        closeModal();
+                    }
+                });
+
+                confirmButton.addEventListener("click", () => {
+                    if (!pendingAction || !pendingAction.url || !pendingAction.target) {
+                        closeModal();
+                        return;
+                    }
+
+                    const headers = {};
+                    if (pendingAction.csrf) {
+                        headers["X-CSRFToken"] = pendingAction.csrf;
+                    }
+
+                    htmx.ajax(pendingAction.method, pendingAction.url, {
+                        target: pendingAction.target,
+                        swap: pendingAction.swap,
+                        headers,
+                    });
+                    closeModal();
+                });
+            })();
+        </script>
     </body>
 </html>
