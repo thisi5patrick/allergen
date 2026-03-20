@@ -131,7 +131,7 @@ def test_registration_process_with_missing_payload(anonymous_client: Client) -> 
                 "password": "password",
                 "password2": "mismatching_password",
             },
-            "password",
+            "password2",
             "Passwords do not match.",
         ),
         (

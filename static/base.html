@@ -17,8 +17,8 @@
               href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         {{ form.media.css }}
     </head>
-    <body class="bg-gray-100 h-screen flex items-center justify-center">
-        <div class="flex flex-col h-full w-full mb-8 pb-8">
+    <body class="bg-gray-100 min-h-screen">
+        <div class="flex min-h-screen w-full flex-col">
             {% block content %}
             {% endblock content %}
         </div>

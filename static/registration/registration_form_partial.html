@@ -2,11 +2,11 @@
       id="registration-form"
       hx-post="{% url 'registration_process' %}"
       hx-swap="outerHTML"
+      hx-disabled-elt="button[type='submit']"
       class="space-y-6">
     {% csrf_token %}
     {% if form.non_field_errors %}
-        <div id="error-non-field"
-             class="text-red-500 text-sm text-center mb-4 p-2 bg-red-100 rounded">
+        <div class="text-red-500 text-sm text-center mb-4 p-2 bg-red-100 rounded">
             {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
         </div>
     {% endif %}
@@ -15,7 +15,14 @@
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <i class="fas fa-user text-gray-400"></i>
             </span>
-            {{ form.username }}
+            <input type="text"
+                   name="{{ form.username.html_name }}"
+                   id="{{ form.username.id_for_label }}"
+                   value="{{ form.username.value|default:'' }}"
+                   placeholder="Username"
+                   autocomplete="username"
+                   autofocus
+                   class="w-full py-3 pl-10 pr-4 text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:bg-white">
         </div>
         {% if form.username.errors %}<div class="text-red-500 text-sm mt-1 pl-3">{{ form.username.errors }}</div>{% endif %}
     </div>
@@ -24,7 +31,13 @@
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <i class="fas fa-envelope text-gray-400"></i>
             </span>
-            {{ form.email }}
+            <input type="email"
+                   name="{{ form.email.html_name }}"
+                   id="{{ form.email.id_for_label }}"
+                   value="{{ form.email.value|default:'' }}"
+                   placeholder="Email"
+                   autocomplete="email"
+                   class="w-full py-3 pl-10 pr-4 text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:bg-white">
         </div>
         {% if form.email.errors %}<div class="text-red-500 text-sm mt-1 pl-3">{{ form.email.errors }}</div>{% endif %}
     </div>
@@ -33,7 +46,16 @@
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <i class="fas fa-lock text-gray-400"></i>
             </span>
-            {{ form.password }}
+            <input type="password"
+                   name="{{ form.password.html_name }}"
+                   id="{{ form.password.id_for_label }}"
+                   placeholder="Password"
+                   autocomplete="new-password"
+                   class="w-full py-3 pl-10 pr-16 text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:bg-white">
+            <button type="button"
+                    class="absolute inset-y-0 right-0 px-4 text-sm font-medium text-purple-600 hover:text-purple-500"
+                    data-password-toggle
+                    data-password-target="{{ form.password.id_for_label }}">Show</button>
         </div>
         {% if form.password.errors %}<div class="text-red-500 text-sm mt-1 pl-3">{{ form.password.errors }}</div>{% endif %}
     </div>
@@ -42,7 +64,16 @@
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <i class="fas fa-lock text-gray-400"></i>
             </span>
-            {{ form.password2 }}
+            <input type="password"
+                   name="{{ form.password2.html_name }}"
+                   id="{{ form.password2.id_for_label }}"
+                   placeholder="Confirm Password"
+                   autocomplete="new-password"
+                   class="w-full py-3 pl-10 pr-16 text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:bg-white">
+            <button type="button"
+                    class="absolute inset-y-0 right-0 px-4 text-sm font-medium text-purple-600 hover:text-purple-500"
+                    data-password-toggle
+                    data-password-target="{{ form.password2.id_for_label }}">Show</button>
         </div>
         {% if form.password2.errors %}<div class="text-red-500 text-sm mt-1 pl-3">{{ form.password2.errors }}</div>{% endif %}
     </div>
@@ -50,7 +81,6 @@
         {{ form.captcha }}
         {% if form.captcha.errors %}<div class="text-red-500 text-sm mt-1 pl-3">{{ form.captcha.errors }}</div>{% endif %}
     </div>
-    <div id="error-non-field" class="text-red-500 text-sm text-center"></div>
     <div class="mt-6">
         <button type="submit"
                 id="submit-button"
@@ -70,4 +100,18 @@
         htmx.trigger(theForm, 'submit');
     }
   }
+
+  (() => {
+    document.querySelectorAll('[data-password-toggle]').forEach((toggle) => {
+      toggle.addEventListener('click', () => {
+        const targetId = toggle.getAttribute('data-password-target');
+        const passwordInput = targetId ? document.getElementById(targetId) : null;
+        if (!passwordInput) return;
+
+        const showPassword = passwordInput.type === 'password';
+        passwordInput.type = showPassword ? 'text' : 'password';
+        toggle.textContent = showPassword ? 'Hide' : 'Show';
+      });
+    });
+  })();
 </script>

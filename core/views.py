@@ -1,7 +1,7 @@
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_not_required
 from django.contrib.auth.models import User
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
@@ -17,6 +17,14 @@ def _get_safe_next_url(request: HttpRequest) -> str:
     if url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
         return next_url
     return ""
+
+
+def _redirect_response(request: HttpRequest, target_url: str) -> HttpResponse:
+    if request.headers.get("HX-Request") == "true":
+        response = HttpResponse(status=204)
+        response["HX-Redirect"] = target_url
+        return response
+    return HttpResponseRedirect(target_url)
 
 
 def view_404(request: HttpRequest, exception: None | Exception = None) -> HttpResponse:
@@ -54,8 +62,8 @@ def login_process(request: HttpRequest) -> HttpResponse:
 
         login(request, user)
         if next_url:
-            return redirect(next_url)
-        return redirect(reverse("allergy:dashboard"))
+            return _redirect_response(request, next_url)
+        return _redirect_response(request, reverse("allergy:dashboard"))
 
     return render(request, "login/login_form_partial.html", {"form": form, "next_url": next_url})
 
@@ -96,7 +104,7 @@ def registration_process(request: HttpRequest) -> HttpResponse:
         login(request, user)
 
         dashboard_redirect = reverse("allergy:dashboard")
-        return redirect(dashboard_redirect)
+        return _redirect_response(request, dashboard_redirect)
 
     return render(request, "registration/registration_form_partial.html", {"form": form})
 

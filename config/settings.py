@@ -15,6 +15,7 @@ from pathlib import Path
 import django_stubs_ext
 import environ
 from django.urls import reverse_lazy
+from django_recaptcha.constants import TEST_PRIVATE_KEY, TEST_PUBLIC_KEY
 
 django_stubs_ext.monkeypatch()
 
@@ -153,8 +154,13 @@ LOGIN_URL = reverse_lazy("login_view")
 LOGIN_REDIRECT_URL = "dashboard"
 APPEND_SLASH = True
 
-RECAPTCHA_PUBLIC_KEY = env("RECAPTCHA_PUBLIC_KEY")
-RECAPTCHA_PRIVATE_KEY = env("RECAPTCHA_PRIVATE_KEY")
+if DEBUG:
+    RECAPTCHA_PUBLIC_KEY = TEST_PUBLIC_KEY
+    RECAPTCHA_PRIVATE_KEY = TEST_PRIVATE_KEY
+    SILENCED_SYSTEM_CHECKS = ["django_recaptcha.recaptcha_test_key_error"]
+else:
+    RECAPTCHA_PUBLIC_KEY = env("RECAPTCHA_PUBLIC_KEY")
+    RECAPTCHA_PRIVATE_KEY = env("RECAPTCHA_PRIVATE_KEY")
 
 SESSION_COOKIE_AGE = 60 * 30
 SESSION_SAVE_EVERY_REQUEST = True

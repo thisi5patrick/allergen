@@ -9,49 +9,10 @@ from django_recaptcha.widgets import ReCaptchaV2Invisible
 
 
 class RegistrationForm(forms.Form):
-    common_input_classes = (
-        "w-full py-3 pl-10 pr-4 text-gray-700 bg-gray-100 "
-        "rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 "
-        "focus:bg-white"
-    )
-
-    username = forms.CharField(
-        max_length=100,
-        required=True,
-        widget=forms.TextInput(
-            attrs={
-                "class": common_input_classes,
-                "placeholder": "Username",
-            }
-        ),
-    )
-    email = forms.EmailField(
-        required=True,
-        widget=forms.EmailInput(
-            attrs={
-                "placeholder": "Email",
-                "class": common_input_classes,
-            },
-        ),
-    )
-    password = forms.CharField(
-        required=True,
-        widget=forms.PasswordInput(
-            attrs={
-                "placeholder": "Password",
-                "class": common_input_classes,
-            },
-        ),
-    )
-    password2 = forms.CharField(
-        required=True,
-        widget=forms.PasswordInput(
-            attrs={
-                "placeholder": "Confirm Password",
-                "class": common_input_classes,
-            },
-        ),
-    )
+    username = forms.CharField(max_length=100, required=True)
+    email = forms.EmailField(required=True)
+    password = forms.CharField(required=True, widget=forms.PasswordInput())
+    password2 = forms.CharField(required=True, widget=forms.PasswordInput())
     captcha = ReCaptchaField(
         widget=ReCaptchaV2Invisible(
             attrs={
@@ -82,7 +43,7 @@ class RegistrationForm(forms.Form):
         password2 = cleaned_data["password2"]
 
         if password1 and password2 and password1 != password2:
-            self.add_error("password", "Passwords do not match.")
+            self.add_error("password2", "Passwords do not match.")
 
         try:
             validate_password(password1)
