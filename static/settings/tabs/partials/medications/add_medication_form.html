@@ -1,6 +1,7 @@
 <form hx-post="{% url 'settings:partial_add_medication' %}"
       hx-target="#medication-form-container"
-      hx-swap="innerHTML">
+      hx-swap="innerHTML"
+      hx-disabled-elt="button[type='submit']">
     {% csrf_token %}
     {% if form.non_field_errors %}
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"

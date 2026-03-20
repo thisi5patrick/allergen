@@ -103,6 +103,6 @@ class MedicationForm(ModelForm[Medication]):
         instance = super().save(False)
         instance.user = cast(User, self.user)
         if commit:
-            instance.save(commit)
+            instance.save()
 
         return instance

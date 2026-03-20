@@ -54,7 +54,9 @@ class Medication(TimestampedModelMixin):
         PILLS = "pills", "Pills"
         INJECTION = "injection", "Injection"
         EYE_DROPS = "eye_drops", "Eye Drops"
-        NOSE_DROPS = "nose_drops", "Nose Drops"
+        NASAL_SPRAY = "nasal_spray", "Nasal Spray"
+        INHALER = "inhaler", "Inhaler"
+        SYRUP = "syrup", "Syrup"
 
     uuid = UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = ForeignKey(User, on_delete=CASCADE)
@@ -73,7 +75,9 @@ class Medication(TimestampedModelMixin):
             Medication.MedicationType.PILLS: '<i class="fas fa-capsules text-blue-500 mr-2"></i>',
             Medication.MedicationType.INJECTION: '<i class="fas fa-syringe text-red-500 mr-2"></i>',
             Medication.MedicationType.EYE_DROPS: '<i class="fas fa-eye-dropper text-green-500 mr-2"></i>',
-            Medication.MedicationType.NOSE_DROPS: '<i class="fas fa-tint text-yellow-500 mr-2"></i>',
+            Medication.MedicationType.NASAL_SPRAY: '<i class="fas fa-spray-can-sparkles text-cyan-500 mr-2"></i>',
+            Medication.MedicationType.INHALER: '<i class="fas fa-wind text-emerald-500 mr-2"></i>',
+            Medication.MedicationType.SYRUP: '<i class="fas fa-prescription-bottle text-amber-500 mr-2"></i>',
         }
         return icons.get(medication_type_value, '<i class="fas fa-question-circle text-gray-500 mr-2"></i>')
 

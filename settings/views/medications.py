@@ -42,11 +42,11 @@ def partial_new_medication_save(request: HttpRequest) -> HttpResponse:
     form = MedicationForm(request.POST, user=user)
 
     if form.is_valid():
-        medication = form.save()
-        new_form = MedicationForm()
+        form.save()
+        medications = Medication.objects.filter(user=user).order_by("medication_name")
         context = {
-            "medication": medication,
-            "form": new_form,
+            "form": MedicationForm(),
+            "medications": medications,
         }
         return render(request, "settings/tabs/partials/medications/add_medication.html", context)
 
@@ -58,10 +58,17 @@ def partial_new_medication_save(request: HttpRequest) -> HttpResponse:
 def partial_delete_medication(request: HttpRequest, medication_uuid: uuid.UUID) -> HttpResponse:
     user = cast(User, request.user)
 
-    medication = Medication.objects.filter(uuid=medication_uuid, user=user).filter()
+    medication = Medication.objects.filter(uuid=medication_uuid, user=user)
     if not medication:
         return HttpResponseBadRequest("Invalid medication parameter provided.")
 
     medication.delete()
 
-    return HttpResponse(status=200)
+    medications = Medication.objects.filter(user=user).order_by("medication_name")
+    return render(
+        request,
+        "settings/tabs/partials/medications/existing_medications.html",
+        {
+            "medications": medications,
+        },
+    )

@@ -95,17 +95,17 @@ def test_partial_save_medication_authenticated_valid(authenticated_client: Clien
     assertTemplateUsed(response, "settings/tabs/partials/medications/add_medication.html")
     assert Medication.objects.filter(user=user, medication_name=med_name, medication_type=med_type).exists()
     new_med = Medication.objects.get(user=user, medication_name=med_name, medication_type=med_type)
-    assert response.context["medication"] == new_med
     assert isinstance(response.context["form"], MedicationForm)
     assert not response.context["form"].is_bound
+    medications = list(response.context["medications"])
+    assert medications == [new_med]
 
-    assertContains(response, 'hx-swap-oob="afterbegin"')
-    assertContains(response, 'id="medication-list-ul"')
+    assertContains(response, 'hx-swap-oob="innerHTML"')
+    assertContains(response, 'id="medication-list-container"')
     assertContains(response, f'<li id="medication-item-{new_med.uuid}"')
     assertContains(response, med_name)
     assertContains(response, new_med.get_medication_type_display())
     assertContains(response, new_med.icon_html)
-    assertContains(response, 'id="no-medications-message" hx-swap-oob="delete"')
     assertContains(response, "<form")
     assertContains(response, 'name="medication_name"')
 
@@ -141,7 +141,7 @@ def test_partial_save_medication_missing_data(authenticated_client: Client, user
 def test_partial_save_medication_duplicate(authenticated_client: Client, user: User) -> None:
     # Given
     med_name = "Flonase"
-    med_type = Medication.MedicationType.NOSE_DROPS
+    med_type = Medication.MedicationType.NASAL_SPRAY
     MedicationFactory.create(user=user, medication_name=med_name, medication_type=med_type)
     url = reverse(SAVE_MEDICATION_PARTIAL_URL_NAME)
     post_data = {"medication_name": med_name, "medication_type": med_type}

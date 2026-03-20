@@ -5,7 +5,7 @@ import pytest
 from django.contrib.auth.models import User
 from django.test import Client
 from django.urls import reverse
-from pytest_django.asserts import assertRedirects
+from pytest_django.asserts import assertContains, assertRedirects, assertTemplateUsed
 
 from allergy.models import Medication
 from tests.factories.medication import MedicationFactory
@@ -44,8 +44,9 @@ def test_partial_delete_medication_authenticated_valid(authenticated_client: Cli
 
     # Then
     assert response.status_code == HTTPStatus.OK
-    assert response.content == b""
+    assertTemplateUsed(response, "settings/tabs/partials/medications/existing_medications.html")
     assert not Medication.objects.filter(pk=medication.pk).exists()
+    assertContains(response, "No medications added yet.")
 
 
 @pytest.mark.django_db
