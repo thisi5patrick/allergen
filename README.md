@@ -68,7 +68,7 @@ docker compose up
 
 2. Create .env file: As above, but ensure POSTGRES_HOST is set to localhost or the address of your manually running PostgreSQL instance.
 
-3. Install Python: Ensure you have Python >=3.13 installed.
+3. Install Python: Ensure you have Python >=3.14 installed.
 
 4. Install UV: Follow instructions at Astral UV Documentation.
 

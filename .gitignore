@@ -28,3 +28,6 @@ media/
 
 # Fly
 fly.toml
+
+# uv
+.uv-cache
