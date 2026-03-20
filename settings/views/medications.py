@@ -6,8 +6,8 @@ from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
-from allergy.forms import MedicationForm
 from allergy.models import Medication
+from settings.forms import AddMedicationForm
 from settings.views.enums import ActiveTab
 
 
@@ -30,7 +30,7 @@ def partial_existing_medications(request: HttpRequest) -> HttpResponse:
 
 @require_GET
 def partial_new_medication_form(request: HttpRequest) -> HttpResponse:
-    form = MedicationForm()
+    form = AddMedicationForm()
 
     context = {"form": form}
     return render(request, "settings/tabs/partials/medications/add_medication_form.html", context)
@@ -39,13 +39,13 @@ def partial_new_medication_form(request: HttpRequest) -> HttpResponse:
 @require_POST
 def partial_new_medication_save(request: HttpRequest) -> HttpResponse:
     user = cast(User, request.user)
-    form = MedicationForm(request.POST, user=user)
+    form = AddMedicationForm(request.POST, user=user)
 
     if form.is_valid():
         form.save()
         medications = Medication.objects.filter(user=user).order_by("medication_name")
         context = {
-            "form": MedicationForm(),
+            "form": AddMedicationForm(),
             "medications": medications,
         }
         return render(request, "settings/tabs/partials/medications/add_medication.html", context)

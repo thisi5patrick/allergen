@@ -6,8 +6,8 @@ from django.test import Client
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertRedirects, assertTemplateUsed
 
-from allergy.forms import MedicationForm
 from allergy.models import Medication
+from settings.forms import AddMedicationForm
 from tests.factories.medication import MedicationFactory
 
 NEW_MEDICATION_FORM_PARTIAL_URL_NAME = "settings:partial_new_medication_form"
@@ -42,7 +42,7 @@ def test_partial_new_medication_form_authenticated(authenticated_client: Client)
     assertTemplateUsed(response, "settings/tabs/partials/medications/add_medication_form.html")
     assert "form" in response.context
     form = response.context["form"]
-    assert isinstance(form, MedicationForm)
+    assert isinstance(form, AddMedicationForm)
     assert not form.is_bound
     assertContains(response, "<form")
     assertContains(response, 'name="medication_name"')
@@ -95,7 +95,7 @@ def test_partial_save_medication_authenticated_valid(authenticated_client: Clien
     assertTemplateUsed(response, "settings/tabs/partials/medications/add_medication.html")
     assert Medication.objects.filter(user=user, medication_name=med_name, medication_type=med_type).exists()
     new_med = Medication.objects.get(user=user, medication_name=med_name, medication_type=med_type)
-    assert isinstance(response.context["form"], MedicationForm)
+    assert isinstance(response.context["form"], AddMedicationForm)
     assert not response.context["form"].is_bound
     medications = list(response.context["medications"])
     assert medications == [new_med]
@@ -130,7 +130,7 @@ def test_partial_save_medication_missing_data(authenticated_client: Client, user
     assertTemplateUsed(response, "settings/tabs/partials/medications/add_medication_form.html")
     assert "form" in response.context
     form = response.context["form"]
-    assert isinstance(form, MedicationForm)
+    assert isinstance(form, AddMedicationForm)
     assert not form.is_valid()
     assert field_to_miss in form.errors
     assert "This field is required." in form.errors[field_to_miss]
@@ -153,7 +153,7 @@ def test_partial_save_medication_duplicate(authenticated_client: Client, user: U
     assert response.status_code == HTTPStatus.OK
     assertTemplateUsed(response, "settings/tabs/partials/medications/add_medication_form.html")
     form = response.context["form"]
-    assert isinstance(form, MedicationForm)
+    assert isinstance(form, AddMedicationForm)
     assert not form.is_valid()
     expected_error_msg = "This medication with the same type already exists for you."
     assert expected_error_msg in form.non_field_errors() or (
@@ -176,7 +176,7 @@ def test_partial_save_medication_invalid_type(authenticated_client: Client, user
     assert response.status_code == HTTPStatus.OK
     assertTemplateUsed(response, "settings/tabs/partials/medications/add_medication_form.html")
     form = response.context["form"]
-    assert isinstance(form, MedicationForm)
+    assert isinstance(form, AddMedicationForm)
     assert not form.is_valid()
     assert "medication_type" in form.errors
     assert "Select a valid choice." in form.errors["medication_type"][0]

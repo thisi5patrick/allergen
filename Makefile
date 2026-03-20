@@ -28,7 +28,7 @@ test-cov:
 	uv run coverage report
 
 lint:
-	uv run ruff check .
+	uv run ruff check . --fix
 	uv run djlint --check .
 
 format:

@@ -8,7 +8,7 @@ from django.shortcuts import render
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from allergy.models import SymptomType
-from settings.forms.new_symptom import AddNewSymptomForm
+from settings.forms import AddSymptomTypeForm
 from settings.views.enums import ActiveTab
 
 
@@ -41,14 +41,14 @@ def partial_existing_symptoms(request: HttpRequest) -> HttpResponse:
 
 @require_GET
 def partial_new_symptom_type_form(request: HttpRequest) -> HttpResponse:
-    form = AddNewSymptomForm()
+    form = AddSymptomTypeForm()
     return render(request, "settings/tabs/partials/symptoms/add_symptom_type.html", {"form": form})
 
 
 @require_POST
 def partial_new_symptom_type_save(request: HttpRequest) -> HttpResponse:
     user = cast(User, request.user)
-    form = AddNewSymptomForm(request.POST, user=user)
+    form = AddSymptomTypeForm(request.POST, user=user)
 
     if form.is_valid():
         form.save()
@@ -59,7 +59,7 @@ def partial_new_symptom_type_save(request: HttpRequest) -> HttpResponse:
             .order_by("name")
         )
         context = {
-            "form": AddNewSymptomForm(),
+            "form": AddSymptomTypeForm(),
             "symptom_types": symptom_types,
         }
         return render(request, "settings/tabs/partials/symptoms/add_symptom_type_oob.html", context)

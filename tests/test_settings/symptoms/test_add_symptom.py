@@ -7,7 +7,7 @@ from django.urls import reverse
 from pytest_django.asserts import assertContains, assertRedirects, assertTemplateUsed
 
 from allergy.models import SymptomType
-from settings.forms.new_symptom import AddNewSymptomForm
+from settings.forms import AddSymptomTypeForm
 from tests.factories.symptom_type import SymptomTypeFactory
 
 NEW_SYMPTOM_FORM_PARTIAL_URL_NAME = "settings:partial_new_symptom_type_form"
@@ -43,7 +43,7 @@ def test_partial_new_symptom_form_authenticated(authenticated_client: Client) ->
     assert "form" in response.context
 
     form = response.context["form"]
-    assert isinstance(form, AddNewSymptomForm)
+    assert isinstance(form, AddSymptomTypeForm)
     assert not form.is_bound
 
     assertContains(response, "<form")
@@ -96,7 +96,7 @@ def test_partial_save_symptom_authenticated_valid(authenticated_client: Client, 
     assert SymptomType.objects.filter(user=user, name=symptom_name).exists()
 
     new_symptom = SymptomType.objects.get(user=user, name=symptom_name)
-    assert isinstance(response.context["form"], AddNewSymptomForm)
+    assert isinstance(response.context["form"], AddSymptomTypeForm)
     assert not response.context["form"].is_bound
     symptom_types = list(response.context["symptom_types"])
     assert symptom_types == [{"uuid": new_symptom.uuid, "name": symptom_name, "entries_count": 0}]
@@ -125,7 +125,7 @@ def test_partial_save_symptom_missing_name(authenticated_client: Client, user: U
     assertTemplateUsed(response, "settings/tabs/partials/symptoms/add_symptom_type.html")
 
     form = response.context["form"]
-    assert isinstance(form, AddNewSymptomForm)
+    assert isinstance(form, AddSymptomTypeForm)
     assert not form.is_valid()
     assert "name" in form.errors
     assert "This field is required." in form.errors["name"]
@@ -146,7 +146,7 @@ def test_partial_save_symptom_invalid_chars(authenticated_client: Client, user: 
     assert response.status_code == HTTPStatus.OK
     assertTemplateUsed(response, "settings/tabs/partials/symptoms/add_symptom_type.html")
     form = response.context["form"]
-    assert isinstance(form, AddNewSymptomForm)
+    assert isinstance(form, AddSymptomTypeForm)
     assert not form.is_valid()
     assert "name" in form.errors
     assert "Symptom name should only contain letters and spaces" in form.errors["name"]
@@ -169,7 +169,7 @@ def test_partial_save_symptom_duplicate_name(authenticated_client: Client, user:
     assertTemplateUsed(response, "settings/tabs/partials/symptoms/add_symptom_type.html")
 
     form = response.context["form"]
-    assert isinstance(form, AddNewSymptomForm)
+    assert isinstance(form, AddSymptomTypeForm)
     assert not form.is_valid()
     assert "name" in form.errors
     assert "You already have a symptom with this name." in form.errors["name"]

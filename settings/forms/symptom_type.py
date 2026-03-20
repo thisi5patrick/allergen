@@ -7,7 +7,7 @@ from django.core.validators import RegexValidator
 from allergy.models import SymptomType
 
 
-class AddNewSymptomForm(forms.ModelForm[SymptomType]):
+class AddSymptomTypeForm(forms.ModelForm[SymptomType]):
     name = forms.CharField(
         max_length=255,
         validators=[
