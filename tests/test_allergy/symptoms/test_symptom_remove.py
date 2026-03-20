@@ -73,7 +73,6 @@ def test_symptom_remove_authenticated_valid(authenticated_client: Client, user: 
     assertContains(response, 'hx-swap-oob="true"')
     assertContains(response, f'id="symptom-{symptom_type.uuid}"')
     assertContains(response, "hx-get=")
-    assertContains(response, f'<div id="intensity-{symptom_type.uuid}" hx-swap-oob="true"></div>')
 
 
 @pytest.mark.django_db

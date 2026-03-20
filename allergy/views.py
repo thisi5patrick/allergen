@@ -90,9 +90,11 @@ def symptoms_container_partial(request: HttpRequest, year: int, month: int, day:
     user = cast(User, request.user)
 
     symptom_entries = (
-        SymptomEntry.objects.filter(user=user, entry_date=selected_date).select_related("symptom_type").all()
+        SymptomEntry.objects.filter(user=user, entry_date=selected_date)
+        .select_related("symptom_type")
+        .order_by("symptom_type__name")
     )
-    all_symptom_types = SymptomType.objects.filter(user=user).all()
+    all_symptom_types = SymptomType.objects.filter(user=user).order_by("name")
 
     selected_symptoms_map = {entry.symptom_type: entry for entry in symptom_entries}
 

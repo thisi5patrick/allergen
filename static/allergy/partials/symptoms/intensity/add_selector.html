@@ -18,5 +18,5 @@
         class="symptom-button px-3 py-2 text-sm rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors"
         hx-delete="{% url 'allergy:symptom_remove_partial' year=selected_date.year month=selected_date.month day=selected_date.day symptom_uuid=symptom_type.uuid %}"
         hx-target="#intensity-{{ symptom_type.uuid }}"
-        hx-swap="outerHTML"
+        hx-swap="delete"
         hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>{{ symptom_type.name }}</button>

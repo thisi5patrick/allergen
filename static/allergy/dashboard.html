@@ -3,20 +3,45 @@
 {% block content %}
     <div class="min-h-screen bg-gray-100 flex flex-col">
         {% include "navbar.html" %}
-        <div class="flex flex-col items-center pt-8 pb-8">
-            <div class="w-64 bg-white border shadow-lg rounded-xl p-4 mb-8">
-                <div class="flex items-center justify-between mb-4">
+        <div class="w-full max-w-6xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 items-start gap-6 xl:grid-cols-[18rem_minmax(0,1fr)]">
+                <div class="self-start bg-white border shadow-lg rounded-2xl p-4">
                     <div id="calendar-container"
                          hx-get="{% url 'allergy:partial_calendar' year=current_year month=current_month day=current_day %}"
                          hx-trigger="load"
-                         hx-swap="innerHTML"></div>
+                         hx-swap="innerHTML">
+                        <div class="animate-pulse space-y-4">
+                            <div class="h-6 w-32 bg-gray-200 rounded"></div>
+                            <div class="grid grid-cols-7 gap-2">
+                                {% for _ in "1234567" %}<div class="h-4 bg-gray-100 rounded"></div>{% endfor %}
+                                {% for _ in "12345678901234567890123456789012345" %}<div class="h-8 bg-gray-100 rounded-full"></div>{% endfor %}
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="w-auto bg-white rounded-lg shadow-md p-4">
-                <div id="allergy-symptoms"
-                     hx-get="{% url 'allergy:symptoms_container_partial' year=current_year month=current_month day=current_day %}"
-                     hx-trigger="load"
-                     hx-swap="innerHTML"></div>
+                <div class="self-start bg-white rounded-2xl shadow-md p-4 sm:p-6 min-w-0">
+                    <div id="allergy-symptoms"
+                         hx-get="{% url 'allergy:symptoms_container_partial' year=current_year month=current_month day=current_day %}"
+                         hx-trigger="load"
+                         hx-swap="innerHTML">
+                        <div class="animate-pulse space-y-4">
+                            <div class="h-6 w-56 bg-gray-200 rounded"></div>
+                            <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+                                {% for _ in "12345678" %}<div class="h-10 bg-gray-100 rounded-lg"></div>{% endfor %}
+                            </div>
+                            <div class="space-y-3">
+                                {% for _ in "123" %}
+                                    <div class="space-y-2">
+                                        <div class="h-4 w-32 bg-gray-100 rounded"></div>
+                                        <div class="flex gap-1">
+                                            {% for _ in "1234567890" %}<div class="h-8 w-8 bg-gray-100 rounded-full"></div>{% endfor %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
