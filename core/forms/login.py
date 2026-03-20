@@ -18,6 +18,8 @@ class LoginForm(forms.Form):
             attrs={
                 "class": common_input_classes,
                 "placeholder": "Username",
+                "autocomplete": "username",
+                "autofocus": True,
             }
         ),
     )
@@ -28,6 +30,7 @@ class LoginForm(forms.Form):
             attrs={
                 "placeholder": "Password",
                 "class": common_input_classes,
+                "autocomplete": "current-password",
             },
         ),
     )

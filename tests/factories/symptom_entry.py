@@ -13,6 +13,6 @@ class SymptomEntryFactory(factory.django.DjangoModelFactory[SymptomEntry]):
         model = SymptomEntry
 
     user = factory.SubFactory(UserFactory)
-    entry_date = factory.LazyFunction(lambda: date.today())
+    entry_date = factory.LazyFunction(date.today)
     intensity = factory.fuzzy.FuzzyInteger(1, 10)
     symptom_type = factory.SubFactory(SymptomTypeFactory, user=factory.SelfAttribute("..user"))

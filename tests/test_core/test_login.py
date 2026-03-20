@@ -32,6 +32,20 @@ def test_login_view_with_anonymous_user(anonymous_client: Client) -> None:
 
 
 @pytest.mark.django_db
+def test_login_view_with_next_url(anonymous_client: Client) -> None:
+    # Given
+    target_url = reverse("allergy:dashboard")
+    url = f"{reverse(LOGIN_VIEW_NAME)}?next={target_url}"
+
+    # When
+    response = anonymous_client.get(url)
+
+    # Then
+    assert response.status_code == 200
+    assert response.context["next_url"] == target_url
+
+
+@pytest.mark.django_db
 def test_login_view_with_authenticated_user(authenticated_client: Client) -> None:
     # Given
     url = reverse(LOGIN_VIEW_NAME)
@@ -96,6 +110,45 @@ def test_login_process(remember_me_payload_value: str | None, expected_expiry_ag
 
         expired_response = anonymous_client.get(expected_redirect)
         assertRedirects(expired_response, expected_redirect_for_expired_session)
+
+
+@pytest.mark.django_db
+def test_login_process_redirects_to_next_url(user: User) -> None:
+    # Given
+    next_url = reverse("allergy:dashboard")
+    url = reverse(LOGIN_PROCESS_NAME)
+    payload = {
+        "username": TEST_USERNAME_1,
+        "password": TEST_PASSWORD_1,
+        "next": next_url,
+    }
+
+    anonymous_client = Client()
+
+    # When
+    response = anonymous_client.post(url, payload)
+
+    # Then
+    assertRedirects(response, next_url)
+
+
+@pytest.mark.django_db
+def test_login_process_ignores_unsafe_next_url(user: User) -> None:
+    # Given
+    url = reverse(LOGIN_PROCESS_NAME)
+    payload = {
+        "username": TEST_USERNAME_1,
+        "password": TEST_PASSWORD_1,
+        "next": "https://evil.example.com",
+    }
+
+    anonymous_client = Client()
+
+    # When
+    response = anonymous_client.post(url, payload)
+
+    # Then
+    assertRedirects(response, reverse(DASHBOARD_VIEW_NAME))
 
 
 @pytest.mark.django_db

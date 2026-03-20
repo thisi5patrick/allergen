@@ -4,11 +4,19 @@ from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_GET, require_POST
 
 from allergy.models import SymptomType
 from core.forms.login import LoginForm
 from core.forms.registration import RegistrationForm
+
+
+def _get_safe_next_url(request: HttpRequest) -> str:
+    next_url = request.GET.get("next") or request.POST.get("next") or ""
+    if url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
+        return next_url
+    return ""
 
 
 def view_404(request: HttpRequest, exception: None | Exception = None) -> HttpResponse:
@@ -27,13 +35,14 @@ def login_view(request: HttpRequest) -> HttpResponse:
         return redirect(dashboard_redirect)
 
     form = LoginForm()
-    return render(request, "login/login.html", {"form": form})
+    return render(request, "login/login.html", {"form": form, "next_url": _get_safe_next_url(request)})
 
 
 @require_POST
 @login_not_required
 def login_process(request: HttpRequest) -> HttpResponse:
     form = LoginForm(request.POST)
+    next_url = _get_safe_next_url(request)
 
     if form.is_valid():
         user = form.cleaned_data["user"]
@@ -44,10 +53,11 @@ def login_process(request: HttpRequest) -> HttpResponse:
             request.session.set_expiry(None)
 
         login(request, user)
-        dashboard_redirect = reverse("allergy:dashboard")
-        return redirect(dashboard_redirect)
+        if next_url:
+            return redirect(next_url)
+        return redirect(reverse("allergy:dashboard"))
 
-    return render(request, "login/login_form_partial.html", {"form": form})
+    return render(request, "login/login_form_partial.html", {"form": form, "next_url": next_url})
 
 
 @require_GET

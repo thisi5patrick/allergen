@@ -43,7 +43,7 @@ def partial_calendar(request: HttpRequest, year: str, month: str, day: str | Non
         year_int = target_date.year
         month_int = target_date.month
 
-    except (ValueError, TypeError):
+    except ValueError, TypeError:
         return HttpResponseBadRequest("Invalid date parameters provided.")
 
     cal_matrix = calendar.monthcalendar(year_int, month_int)
@@ -154,7 +154,7 @@ def symptom_remove_partial(
     if not symptom_type:
         return HttpResponseBadRequest("Invalid or unknown symptom specified for removal.")
 
-    deleted_count, _ = SymptomEntry.objects.filter(
+    _deleted_count, _ = SymptomEntry.objects.filter(
         user=user, entry_date=selected_date, symptom_type=symptom_type
     ).delete()
 
@@ -190,7 +190,7 @@ def symptom_save_partial(request: HttpRequest) -> HttpResponse:
     if symptom_uuid_str:
         try:
             symptom_type = SymptomType.objects.filter(user=user, uuid=symptom_uuid_str).first()
-        except (ValueError, ValidationError):
+        except ValueError, ValidationError:
             pass
 
     context = {"form": form, "symptom_type": symptom_type, "selected_date_str": request.POST.get("selected_date")}
