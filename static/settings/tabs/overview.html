@@ -11,26 +11,60 @@
                 <p class="text-gray-600">Member since {{ request.user.date_joined|date:"F j, Y" }}</p>
             </div>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-            <div class="bg-purple-50 rounded-lg p-4">
-                <div class="flex items-center">
-                    <div class="rounded-full bg-purple-200 p-3 mr-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+            <div class="h-full bg-purple-50 rounded-lg p-4">
+                <div class="flex h-full items-start gap-4">
+                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-purple-200">
                         <i class="fas fa-calendar-check text-purple-700"></i>
                     </div>
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-800">{{ days_with_symptoms }}</h3>
-                        <p class="text-sm text-gray-600">Days with recorded symptoms</p>
+                    <div class="flex min-h-12 flex-col justify-center">
+                        <h3 class="text-lg font-semibold leading-none text-gray-800">{{ days_with_symptoms }}</h3>
+                        <p class="mt-2 text-sm leading-snug text-gray-600">Days with recorded symptoms</p>
                     </div>
                 </div>
             </div>
-            <div class="bg-blue-50 rounded-lg p-4">
-                <div class="flex items-center">
-                    <div class="rounded-full bg-blue-200 p-3 mr-4">
+            <div class="h-full bg-blue-50 rounded-lg p-4">
+                <div class="flex h-full items-start gap-4">
+                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-200">
                         <i class="fas fa-chart-line text-blue-700"></i>
                     </div>
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-800">{{ total_entries }}</h3>
-                        <p class="text-sm text-gray-600">Total symptom entries</p>
+                    <div class="flex min-h-12 flex-col justify-center">
+                        <h3 class="text-lg font-semibold leading-none text-gray-800">{{ total_entries }}</h3>
+                        <p class="mt-2 text-sm leading-snug text-gray-600">Total symptom entries</p>
+                    </div>
+                </div>
+            </div>
+            <div class="h-full bg-amber-50 rounded-lg p-4">
+                <div class="flex h-full items-start gap-4">
+                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-amber-200">
+                        <i class="fas fa-gauge-high text-amber-700"></i>
+                    </div>
+                    <div class="flex min-h-12 flex-col justify-center">
+                        <h3 class="text-lg font-semibold leading-none text-gray-800">
+                            {% if average_intensity is not None %}
+                                {{ average_intensity|floatformat:1 }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </h3>
+                        <p class="mt-2 text-sm leading-snug text-gray-600">Average intensity</p>
+                    </div>
+                </div>
+            </div>
+            <div class="h-full bg-emerald-50 rounded-lg p-4">
+                <div class="flex h-full items-start gap-4">
+                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-200">
+                        <i class="fas fa-clock-rotate-left text-emerald-700"></i>
+                    </div>
+                    <div class="flex min-h-12 flex-col justify-center">
+                        <h3 class="text-lg font-semibold leading-none text-gray-800">
+                            {% if latest_entry_date %}
+                                {{ latest_entry_date|date:"M j, Y" }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </h3>
+                        <p class="mt-2 text-sm leading-snug text-gray-600">Latest tracked date</p>
                     </div>
                 </div>
             </div>

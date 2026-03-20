@@ -14,11 +14,10 @@
                         {% endif %}
                     </span>
                 </div>
-                <button hx-delete="{% url 'settings:partial_symptom_type_remove' symptom_type_uuid=symptom_type.uuid %}"
-                        hx-confirm="Are you sure you want to delete this symptom? All related entries will be permanently removed."
-                        hx-target="#symptom-type-{{ symptom_type.uuid }}"
-                        hx-swap="outerHTML"
-                        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                <button type="button"
+                        data-delete-symptom-url="{% url 'settings:partial_symptom_type_remove' symptom_type_uuid=symptom_type.uuid %}"
+                        data-symptom-name="{{ symptom_type.name }}"
+                        data-csrf-token="{{ csrf_token }}"
                         class="text-red-500 hover:text-red-700 focus:outline-none">
                     <i class="fas fa-trash-alt"></i>
                 </button>

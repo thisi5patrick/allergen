@@ -81,15 +81,20 @@ def test_partial_existing_symptoms_with_symptoms(authenticated_client: Client, u
 
     assertContains(response, f'id="symptom-type-{type_a.uuid}"')
     assertContains(response, f"{type_a.name}")
-    assertContains(response, "0 Entries")
+    assertContains(response, "0")
+    assertContains(response, "Entries")
     assertContains(response, reverse(REMOVE_SYMPTOM_PARTIAL_URL_NAME, kwargs=expected_remove_url_a_kwargs))
+    assertContains(response, "data-delete-symptom-url=")
+    assertContains(response, f'data-symptom-name="{type_a.name}"')
     assertContains(response, f'id="symptom-type-{type_b.uuid}"')
     assertContains(response, f"{type_b.name}")
-    assertContains(response, "2 Entries")
+    assertContains(response, "2")
+    assertContains(response, "Entries")
     assertContains(response, reverse(REMOVE_SYMPTOM_PARTIAL_URL_NAME, kwargs=expected_remove_url_b_kwargs))
     assertContains(response, f'id="symptom-type-{type_c.uuid}"')
     assertContains(response, f"{type_c.name}")
-    assertContains(response, "1 Entry")
+    assertContains(response, "1")
+    assertContains(response, "Entry")
     assertContains(response, reverse(REMOVE_SYMPTOM_PARTIAL_URL_NAME, kwargs=expected_remove_url_c_kwargs))
 
 

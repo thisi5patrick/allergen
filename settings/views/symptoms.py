@@ -51,14 +51,18 @@ def partial_new_symptom_type_save(request: HttpRequest) -> HttpResponse:
     form = AddNewSymptomForm(request.POST, user=user)
 
     if form.is_valid():
-        symptom_type = form.save()
-        new_empty_form = AddNewSymptomForm()
+        form.save()
+        symptom_types = (
+            SymptomType.objects.filter(user=user)
+            .values("uuid", "name")
+            .annotate(entries_count=Count("symptom_entries"))
+            .order_by("name")
+        )
         context = {
-            "symptom_type": symptom_type,
-            "form": new_empty_form,
+            "form": AddNewSymptomForm(),
+            "symptom_types": symptom_types,
         }
-        response = render(request, "settings/tabs/partials/symptoms/add_symptom_type_oob.html", context)
-        return response
+        return render(request, "settings/tabs/partials/symptoms/add_symptom_type_oob.html", context)
 
     return render(
         request,
@@ -80,4 +84,17 @@ def partial_symptom_remove(request: HttpRequest, symptom_type_uuid: uuid.UUID) -
 
     symptom.delete()
 
-    return HttpResponse(status=200)
+    symptom_types = (
+        SymptomType.objects.filter(user=user)
+        .values("uuid", "name")
+        .annotate(entries_count=Count("symptom_entries"))
+        .order_by("name")
+    )
+
+    return render(
+        request,
+        "settings/tabs/partials/symptoms/existing_symptoms.html",
+        {
+            "symptom_types": symptom_types,
+        },
+    )

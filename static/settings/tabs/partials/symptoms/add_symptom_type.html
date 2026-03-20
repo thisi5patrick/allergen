@@ -1,6 +1,7 @@
 <form hx-post="{% url 'settings:partial_new_symptom_type_save' %}"
       hx-target="#add-symptom-form-container"
       hx-swap="innerHTML"
+      hx-disabled-elt="button[type='submit']"
       class="space-y-4">
     {% csrf_token %}
     <div>

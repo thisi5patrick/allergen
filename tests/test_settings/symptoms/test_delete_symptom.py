@@ -5,7 +5,7 @@ import pytest
 from django.contrib.auth.models import User
 from django.test import Client
 from django.urls import reverse
-from pytest_django.asserts import assertRedirects
+from pytest_django.asserts import assertContains, assertRedirects, assertTemplateUsed
 
 from allergy.models import SymptomEntry, SymptomType
 from tests.factories.symptom_entry import SymptomEntryFactory
@@ -49,9 +49,10 @@ def test_partial_remove_symptom_type_authenticated_valid(authenticated_client: C
 
     # Then
     assert response.status_code == HTTPStatus.OK
-    assert response.content == b""
+    assertTemplateUsed(response, "settings/tabs/partials/symptoms/existing_symptoms.html")
     assert not SymptomType.objects.filter(pk=symptom_type.pk).exists()
     assert not SymptomEntry.objects.filter(pk=entry.pk).exists()
+    assertContains(response, "You haven't added any symptoms yet.")
 
 
 @pytest.mark.django_db

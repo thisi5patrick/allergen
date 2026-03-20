@@ -49,9 +49,13 @@ def test_overview_tab_authenticated_no_data(authenticated_client: Client, user: 
     assert context["total_entries"] == 0
     assert len(context["recent_symptoms"]) == 0
     assert len(context["top_symptoms"]) == 0
+    assert context["average_intensity"] is None
+    assert context["latest_entry_date"] is None
 
     assertContains(response, "Days with recorded symptoms")
     assertContains(response, '<h3 class="text-lg font-semibold text-gray-800">0</h3>')
+    assertContains(response, "Average intensity")
+    assertContains(response, "Latest tracked date")
     assertContains(response, "No recent symptom entries.")
     assertContains(response, "Start tracking your symptoms to see a summary.")
     assertContains(response, user.username)
@@ -91,6 +95,8 @@ def test_overview_tab_authenticated_with_data(authenticated_client: Client, user
     assert context["active_tab"] == ActiveTab.OVERVIEW
     assert context["days_with_symptoms"] == 3
     assert context["total_entries"] == 5
+    assert context["average_intensity"] == 6.0
+    assert context["latest_entry_date"] == today
 
     recent_symptoms = context["recent_symptoms"]
     assert len(recent_symptoms) == 5
@@ -110,6 +116,9 @@ def test_overview_tab_authenticated_with_data(authenticated_client: Client, user
 
     assertContains(response, '<h3 class="text-lg font-semibold text-gray-800">3</h3>')
     assertContains(response, '<h3 class="text-lg font-semibold text-gray-800">5</h3>')
+    assertContains(response, "6.0")
+    assertContains(response, today.strftime("%b"))
+    assertContains(response, str(today.year))
     assertContains(response, "Recent Activity")
     assertContains(response, f"{type_cat.name} (Intensity: {entry4_cat_today.intensity})")
     assertContains(response, f"{type_pollen.name} (Intensity: {entry5_pollen_today.intensity})")
@@ -145,6 +154,8 @@ def test_overview_tab_data_isolation(
     context_user1 = response_user1.context
     assert context_user1["days_with_symptoms"] == 2
     assert context_user1["total_entries"] == 2
+    assert context_user1["average_intensity"] == 5.5
+    assert context_user1["latest_entry_date"] == today
     assert len(context_user1["recent_symptoms"]) == 2
     assert entry_u1_1 in context_user1["recent_symptoms"]
     assert entry_u1_2 in context_user1["recent_symptoms"]
@@ -161,6 +172,8 @@ def test_overview_tab_data_isolation(
     context_user2 = response_user2.context
     assert context_user2["days_with_symptoms"] == 1
     assert context_user2["total_entries"] == 1
+    assert context_user2["average_intensity"] == 8.0
+    assert context_user2["latest_entry_date"] == today
     assert len(context_user2["recent_symptoms"]) == 1
     assert context_user2["recent_symptoms"][0] == entry_u2_1
     assert len(context_user2["top_symptoms"]) == 1
